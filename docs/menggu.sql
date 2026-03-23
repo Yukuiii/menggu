@@ -33,17 +33,47 @@ CREATE TABLE `users` (
 CREATE TABLE `creators` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '创作者ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '关联用户ID',
-  `name` VARCHAR(50) NOT NULL COMMENT '创作者名称',
+  `name` VARCHAR(50) NOT NULL COMMENT '创作者名称/工作室名',
+  `avatar` VARCHAR(255) DEFAULT NULL COMMENT '创作者头像',
   `intro` TEXT DEFAULT NULL COMMENT '简介',
   `portfolio` TEXT DEFAULT NULL COMMENT '作品集链接',
   `contact` VARCHAR(100) DEFAULT NULL COMMENT '联系方式',
   `fans_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '粉丝数',
+  `works_count` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '已发布作品数',
+  `total_sales` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总销量（件数）',
+  `total_revenue` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '累计收益（元）',
+  `available_revenue` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '可提现收益（元）',
+  `withdrawn_revenue` DECIMAL(12,2) NOT NULL DEFAULT 0.00 COMMENT '已提现收益（元）',
+  `commission_rate` DECIMAL(4,2) NOT NULL DEFAULT 90.00 COMMENT '分成比例（%），默认创作者90%',
+  `is_certified` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否认证创作者 0否 1是',
+  `certified_type` VARCHAR(20) DEFAULT NULL COMMENT '认证类型：individual个人/studio工作室/institution机构',
   `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态 0待审核 1已通过 2已拒绝',
+  `reject_reason` VARCHAR(200) DEFAULT NULL COMMENT '拒绝原因',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_id` (`user_id`)
 ) ENGINE=InnoDB COMMENT='创作者表';
+
+-- ----------------------------
+-- 创作者收益明细表
+-- ----------------------------
+CREATE TABLE `creator_revenues` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `creator_id` INT UNSIGNED NOT NULL COMMENT '创作者ID',
+  `order_id` INT UNSIGNED NOT NULL COMMENT '关联订单ID',
+  `collection_id` INT UNSIGNED NOT NULL COMMENT '关联藏品ID',
+  `order_amount` DECIMAL(10,2) NOT NULL COMMENT '订单金额',
+  `commission_rate` DECIMAL(4,2) NOT NULL COMMENT '分成比例（%）',
+  `revenue_amount` DECIMAL(10,2) NOT NULL COMMENT '创作者实际收益',
+  `platform_amount` DECIMAL(10,2) NOT NULL COMMENT '平台抽成',
+  `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态 0待结算 1已结算 2已提现',
+  `settled_at` DATETIME DEFAULT NULL COMMENT '结算时间',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_creator_id` (`creator_id`),
+  KEY `idx_order_id` (`order_id`)
+) ENGINE=InnoDB COMMENT='创作者收益明细表';
 
 -- ----------------------------
 -- 藏品系列表
