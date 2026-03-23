@@ -106,7 +106,7 @@ const getStatusInfo = (status) => {
             <h1><Palette :size="32" /> 创作者工作台</h1>
             <p>管理你的数字藏品，查看审核状态与收益数据</p>
           </div>
-          <button class="btn-create"><Plus :size="18" /> 发布新藏品</button>
+          <button class="btn-create" @click="router.push('/publish')"><Plus :size="18" /> 发布新藏品</button>
         </div>
 
         <!-- 统计卡片 -->
@@ -205,7 +205,7 @@ const getStatusInfo = (status) => {
           <Palette :size="48" class="empty-icon" />
           <h3>暂无作品</h3>
           <p>开始发布你的第一件数字藏品吧</p>
-          <button class="btn-create-sm"><Plus :size="14" /> 发布藏品</button>
+          <button class="btn-create-sm" @click="router.push('/publish')"><Plus :size="14" /> 发布藏品</button>
         </div>
       </div>
     </main>

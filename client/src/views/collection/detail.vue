@@ -116,6 +116,12 @@ const getTransferInfo = (type) => {
     <!-- 主体内容 -->
     <main class="detail-main">
       <div class="detail-inner">
+        <!-- 返回 -->
+        <button class="back-btn" @click="router.back()">
+          <ArrowLeft :size="16" />
+          返回上一页
+        </button>
+
         <!-- 上半区：左图 + 右信息 -->
         <div class="detail-top">
           <!-- 左侧大图 -->
@@ -439,6 +445,9 @@ const getTransferInfo = (type) => {
 /* ===== 主体 ===== */
 .detail-main { padding: 40px 0 60px; }
 .detail-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+.back-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 0; border: none; background: none; font-size: 14px; color: var(--text-light); cursor: pointer; transition: color 0.2s; font-family: inherit; margin-bottom: 24px; }
+.back-btn:hover { color: var(--accent); }
 
 /* ===== 上半区 ===== */
 .detail-top {

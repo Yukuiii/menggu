@@ -63,6 +63,11 @@ const routes = [
         component: () => import('../views/creator/index.vue')
       },
       {
+        path: 'publish',
+        name: 'PublishCollection',
+        component: () => import('../views/creator/publish.vue')
+      },
+      {
         path: 'admin',
         name: 'AdminDashboard',
         component: () => import('../views/admin/index.vue')
