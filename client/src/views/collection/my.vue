@@ -94,7 +94,7 @@ const totalValue = computed(() =>
       <div class="main-inner">
         <!-- 网格视图 -->
         <div v-if="filtered.length && viewMode === 'grid'" class="grid-view">
-          <div v-for="item in filtered" :key="item.id" class="card" @click="router.push(`/collection/${item.id}`)">
+          <div v-for="item in filtered" :key="item.id" class="card" @click="router.push(`/my-collection/${item.id}`)">
             <div class="card-cover">
               <img :src="item.cover" :alt="item.name" class="card-img" />
               <div class="card-token">#{{ item.tokenId }}</div>
@@ -113,7 +113,7 @@ const totalValue = computed(() =>
 
         <!-- 列表视图 -->
         <div v-if="filtered.length && viewMode === 'list'" class="list-view">
-          <div v-for="item in filtered" :key="item.id" class="list-item" @click="router.push(`/collection/${item.id}`)">
+          <div v-for="item in filtered" :key="item.id" class="list-item" @click="router.push(`/my-collection/${item.id}`)">
             <img :src="item.cover" :alt="item.name" class="list-img" />
             <div class="list-info">
               <div class="list-series">{{ item.seriesName }}</div>

@@ -38,6 +38,11 @@ const routes = [
         component: () => import('../views/collection/my.vue')
       },
       {
+        path: 'my-collection/:id',
+        name: 'MyCollectionDetail',
+        component: () => import('../views/collection/my-detail.vue')
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('../views/user/profile.vue')
