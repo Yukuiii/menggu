@@ -132,8 +132,8 @@ const steps = [
         </div>
 
         <div class="nav-actions">
-          <button class="btn-nav-outline">登录</button>
-          <button class="btn-nav-primary">免费注册</button>
+          <router-link to="/login" class="btn-nav-outline">登录</router-link>
+          <router-link to="/register" class="btn-nav-primary">免费注册</router-link>
         </div>
 
         <!-- 移动端汉堡按钮 -->
@@ -153,7 +153,7 @@ const steps = [
           :class="{ active: activeSection === 'how-it-works' }">购买流程</a>
         <a href="#stats" @click.prevent="scrollToSection('stats')"
           :class="{ active: activeSection === 'stats' }">平台数据</a>
-        <button class="btn-nav-primary" style="width:100%;margin-top:8px;">免费注册</button>
+        <router-link to="/register" class="btn-nav-primary" style="width:100%;margin-top:8px;display:block;text-align:center;">免费注册</router-link>
       </div>
     </nav>
 
@@ -170,11 +170,11 @@ const steps = [
             蒙古族服饰国家级非遗数字藏品平台，链上存证 · 限量发行 · 永久收藏，用数字技术守护千年民族文化
           </p>
           <div class="hero-actions">
-            <button class="btn-primary">
+            <router-link to="/market" class="btn-primary">
               <span>探索藏品市场</span>
               <ArrowRight :size="16" />
-            </button>
-            <button class="btn-outline">了解更多</button>
+            </router-link>
+            <router-link to="/register" class="btn-outline">立即注册</router-link>
           </div>
         </div>
 
@@ -307,8 +307,8 @@ const steps = [
         <h2 class="cta-title">开启你的非遗数字藏品之旅</h2>
         <p class="cta-desc">注册即可浏览全部藏品，用数字方式收藏千年民族文化</p>
         <div class="cta-actions">
-          <button class="btn-cta">立即注册，免费体验</button>
-          <button class="btn-cta-outline">了解更多</button>
+          <router-link to="/register" class="btn-cta">立即注册，免费体验</router-link>
+          <router-link to="/login" class="btn-cta-outline">已有账号，去登录</router-link>
         </div>
       </div>
     </section>
@@ -479,6 +479,8 @@ a {
 }
 
 .btn-nav-outline {
+  display: inline-flex;
+  align-items: center;
   padding: 8px 20px;
   border-radius: 8px;
   background: transparent;
@@ -488,6 +490,7 @@ a {
   border: 1.5px solid var(--border);
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
 }
 
 .btn-nav-outline:hover {
@@ -496,6 +499,8 @@ a {
 }
 
 .btn-nav-primary {
+  display: inline-flex;
+  align-items: center;
   padding: 10px 28px;
   border-radius: 8px;
   background: var(--accent);
@@ -505,6 +510,7 @@ a {
   border: none;
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
 }
 
 .btn-nav-primary:hover {
@@ -652,6 +658,8 @@ a {
 }
 
 .btn-outline {
+  display: inline-flex;
+  align-items: center;
   padding: 14px 36px;
   border-radius: 8px;
   background: transparent;
@@ -661,6 +669,7 @@ a {
   border: 1.5px solid var(--border);
   cursor: pointer;
   transition: all 0.3s;
+  text-decoration: none;
 }
 
 .btn-outline:hover {
@@ -1227,6 +1236,8 @@ a {
 }
 
 .btn-cta {
+  display: inline-flex;
+  align-items: center;
   padding: 14px 40px;
   border-radius: 8px;
   background: #fff;
@@ -1236,6 +1247,7 @@ a {
   border: none;
   cursor: pointer;
   transition: all 0.3s;
+  text-decoration: none;
 }
 
 .btn-cta:hover {
@@ -1244,6 +1256,8 @@ a {
 }
 
 .btn-cta-outline {
+  display: inline-flex;
+  align-items: center;
   padding: 14px 40px;
   border-radius: 8px;
   background: transparent;
@@ -1253,6 +1267,7 @@ a {
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: all 0.3s;
+  text-decoration: none;
 }
 
 .btn-cta-outline:hover {
