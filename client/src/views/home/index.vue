@@ -118,7 +118,6 @@ const steps = [
       <div class="nav-inner">
         <a href="/" class="nav-logo">
           <img src="../../assets/logo.png" alt="蒙服饰" class="logo-image" />
-          <span class="logo-text">蒙古非遗藏品</span>
         </a>
         <!-- 桌面端菜单 -->
         <div class="nav-links">
@@ -355,8 +354,7 @@ const steps = [
         <div class="footer-grid">
           <div class="footer-brand">
             <a href="/" class="nav-logo" style="margin-bottom: 16px;">
-              <img src="../../assets/logo.png" alt="蒙服饰" class="logo-image" />
-              <span class="logo-text">蒙古非遗藏品</span>
+              <img src="../../assets/logo.svg" alt="蒙服饰" class="logo-image" />
             </a>
             <p class="footer-desc">蒙古族服饰非物质文化遗产数字藏品平台，以数字技术守护民族文化瑰宝。</p>
           </div>
@@ -453,7 +451,7 @@ a {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 40px;
-  height: 72px;
+  height: 96px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -469,8 +467,8 @@ a {
 }
 
 .logo-image {
-  width: 36px;
-  height: 36px;
+  width: 144px;
+  height: 144px;
   object-fit: contain;
 }
 
