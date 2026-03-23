@@ -179,43 +179,8 @@ const steps = [
         </div>
 
         <div class="hero-visual">
-          <!-- 手机 mockup -->
-          <div class="phone-mockup">
-            <div class="phone-screen">
-              <div class="mock-header">
-                <div class="mock-status-bar">
-                  <span>9:41</span>
-                  <div class="mock-notch"></div>
-                  <span style="display:flex;align-items:center;gap:4px;">
-                    <TrendingUp :size="12" color="rgba(255,255,255,0.8)" />
-                  </span>
-                </div>
-                <div class="mock-app-bar">
-                  <span class="mock-app-title">蒙古非遗藏品</span>
-                </div>
-              </div>
-              <div class="mock-content">
-                <div class="mock-card" style="background: linear-gradient(135deg, #C6893F, #E2B97F);">
-                  <div class="mock-card-label">热门发售中</div>
-                  <div class="mock-card-value">蒙古族婚礼头饰</div>
-                  <div class="mock-progress">
-                    <div class="mock-progress-bar" style="width: 68%"></div>
-                  </div>
-                  <div class="mock-card-sub">已售 680 / 1000 份</div>
-                </div>
-                <div class="mock-list">
-                  <div class="mock-list-item" v-for="c in categories.slice(0, 3)" :key="c.name">
-                    <div class="mock-list-dot" :style="{ background: c.color }"></div>
-                    <div>
-                      <div class="mock-list-title">{{ c.name }}</div>
-                      <div class="mock-list-sub">{{ c.desc.slice(0, 12) }}...</div>
-                    </div>
-                    <div class="mock-list-arrow">→</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- 蒙服饰 APP 截图 -->
+          <img src="../../assets/蒙服饰.png" alt="蒙服饰 APP" class="hero-app-screenshot" />
 
           <!-- 浮动装饰元素 -->
           <div class="float-dot dot-1"></div>
@@ -706,12 +671,13 @@ a {
 
 /* 手机 mockup */
 .hero-visual {
-  flex: 0 0 380px;
+  flex: 0 0 720px;
   position: relative;
   display: flex;
   justify-content: center;
 }
 
+/* 
 .phone-mockup {
   width: 280px;
   background: #fff;
@@ -721,6 +687,20 @@ a {
   position: relative;
   z-index: 2;
   animation: float 6s ease-in-out infinite;
+}
+*/
+
+/* APP 截图样式 */
+.hero-app-screenshot {
+  width: 100%;
+  max-width: 680px;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(198, 137, 63, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 2;
+  animation: float 6s ease-in-out infinite;
+  object-fit: contain;
+  margin-left: 60px;
 }
 
 .phone-screen {
