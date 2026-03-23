@@ -99,23 +99,6 @@ const getTransferInfo = (type) => {
 
 <template>
   <div class="detail-page">
-    <!-- 顶部导航 -->
-    <nav class="detail-nav">
-      <div class="nav-inner">
-        <router-link to="/" class="nav-logo">
-          <img src="../../assets/logo.png" alt="蒙服饰" class="logo-image" />
-        </router-link>
-        <div class="nav-links">
-          <router-link to="/" class="nav-link">首页</router-link>
-          <router-link to="/market" class="nav-link">藏品市场</router-link>
-          <router-link to="/my-collections" class="nav-link">我的藏品</router-link>
-        </div>
-        <div class="nav-actions">
-          <router-link to="/login" class="btn-nav-outline">登录</router-link>
-          <router-link to="/register" class="btn-nav-primary">注册</router-link>
-        </div>
-      </div>
-    </nav>
 
     <!-- 面包屑 -->
     <div class="breadcrumb-bar">
@@ -359,10 +342,7 @@ const getTransferInfo = (type) => {
       </div>
     </main>
 
-    <!-- 页脚 -->
-    <footer class="detail-footer">
-      <p>© 2026 蒙古服饰非遗数字藏品平台. All rights reserved.</p>
-    </footer>
+
   </div>
 </template>
 
