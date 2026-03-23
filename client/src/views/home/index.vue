@@ -319,7 +319,7 @@ const steps = [
         <div class="footer-grid">
           <div class="footer-brand">
             <a href="/" class="nav-logo" style="margin-bottom: 16px;">
-              <img src="../../assets/logo.svg" alt="蒙服饰" class="logo-image" />
+              <img src="../../assets/logo.png" alt="蒙服饰" class="logo-image" />
             </a>
             <p class="footer-desc">蒙古族服饰非物质文化遗产数字藏品平台，以数字技术守护民族文化瑰宝。</p>
           </div>
