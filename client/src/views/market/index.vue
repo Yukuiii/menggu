@@ -758,31 +758,33 @@ const getCategoryColor = (category) => {
 
 .card-status {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 14px;
+  left: 14px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 2;
 }
 
 .status-upcoming {
-  background: rgba(253, 126, 20, 0.15);
-  color: #FD7E14;
+  background: rgba(253, 126, 20, 0.9);
+  color: #fff;
 }
 
 .status-selling {
-  background: rgba(32, 201, 151, 0.15);
-  color: #20C997;
+  background: rgba(32, 201, 151, 0.9);
+  color: #fff;
 }
 
 .status-soldout {
-  background: rgba(153, 153, 153, 0.15);
-  color: #999;
+  background: rgba(153, 153, 153, 0.85);
+  color: #fff;
 }
 
 .card-cover-icon {
