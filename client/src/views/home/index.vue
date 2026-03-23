@@ -5,7 +5,7 @@
 import { ref, onMounted } from 'vue'
 import {
   Gem, ShieldCheck, Repeat, Palette,
-  Image, Music, Video, Box,
+  Image, Video, Box,
   Users, FileText, TrendingUp, Award,
   Menu, X, ArrowRight,
   MousePointerClick, CreditCard, Link, Trophy
@@ -123,10 +123,14 @@ const steps = [
 
         <!-- 桌面端菜单 -->
         <div class="nav-links">
-          <a href="#features" @click.prevent="scrollToSection('features')" :class="['nav-link', { active: activeSection === 'features' }]">平台特色</a>
-          <a href="#categories" @click.prevent="scrollToSection('categories')" :class="['nav-link', { active: activeSection === 'categories' }]">藏品分类</a>
-          <a href="#how-it-works" @click.prevent="scrollToSection('how-it-works')" :class="['nav-link', { active: activeSection === 'how-it-works' }]">购买流程</a>
-          <a href="#stats" @click.prevent="scrollToSection('stats')" :class="['nav-link', { active: activeSection === 'stats' }]">平台数据</a>
+          <a href="#features" @click.prevent="scrollToSection('features')"
+            :class="['nav-link', { active: activeSection === 'features' }]">平台特色</a>
+          <a href="#categories" @click.prevent="scrollToSection('categories')"
+            :class="['nav-link', { active: activeSection === 'categories' }]">藏品分类</a>
+          <a href="#how-it-works" @click.prevent="scrollToSection('how-it-works')"
+            :class="['nav-link', { active: activeSection === 'how-it-works' }]">购买流程</a>
+          <a href="#stats" @click.prevent="scrollToSection('stats')"
+            :class="['nav-link', { active: activeSection === 'stats' }]">平台数据</a>
         </div>
 
         <div class="nav-actions">
@@ -143,10 +147,14 @@ const steps = [
 
       <!-- 移动端菜单 -->
       <div v-if="navOpen" class="nav-mobile">
-        <a href="#features" @click.prevent="scrollToSection('features')" :class="{ active: activeSection === 'features' }">平台特色</a>
-        <a href="#categories" @click.prevent="scrollToSection('categories')" :class="{ active: activeSection === 'categories' }">藏品分类</a>
-        <a href="#how-it-works" @click.prevent="scrollToSection('how-it-works')" :class="{ active: activeSection === 'how-it-works' }">购买流程</a>
-        <a href="#stats" @click.prevent="scrollToSection('stats')" :class="{ active: activeSection === 'stats' }">平台数据</a>
+        <a href="#features" @click.prevent="scrollToSection('features')"
+          :class="{ active: activeSection === 'features' }">平台特色</a>
+        <a href="#categories" @click.prevent="scrollToSection('categories')"
+          :class="{ active: activeSection === 'categories' }">藏品分类</a>
+        <a href="#how-it-works" @click.prevent="scrollToSection('how-it-works')"
+          :class="{ active: activeSection === 'how-it-works' }">购买流程</a>
+        <a href="#stats" @click.prevent="scrollToSection('stats')"
+          :class="{ active: activeSection === 'stats' }">平台数据</a>
         <button class="btn-nav-primary" style="width:100%;margin-top:8px;">免费注册</button>
       </div>
     </nav>
@@ -215,8 +223,12 @@ const steps = [
           <div class="float-dot dot-1"></div>
           <div class="float-dot dot-2"></div>
           <div class="float-dot dot-3"></div>
-          <div class="float-icon icon-1"><Gem :size="24" color="var(--accent)" /></div>
-          <div class="float-icon icon-2"><Palette :size="24" color="#FF6B6B" /></div>
+          <div class="float-icon icon-1">
+            <Gem :size="24" color="var(--accent)" />
+          </div>
+          <div class="float-icon icon-2">
+            <Palette :size="24" color="#FF6B6B" />
+          </div>
         </div>
       </div>
 
@@ -570,6 +582,7 @@ a {
 }
 
 @media (max-width: 768px) {
+
   .nav-links,
   .nav-actions {
     display: none;
@@ -889,13 +902,27 @@ a {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* Hero 底部统计条 */
