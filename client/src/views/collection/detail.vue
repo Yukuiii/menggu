@@ -168,6 +168,7 @@ const getTransferInfo = (type) => {
                 class="btn-buy"
                 :class="{ disabled: collection.status === 'soldout' }"
                 :disabled="collection.status === 'soldout'"
+                @click="collection.status === 'selling' && router.push(`/checkout/${collection.id}`)"
               >
                 <template v-if="collection.status === 'soldout'">
                   <CheckCircle :size="18" />

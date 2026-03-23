@@ -53,6 +53,11 @@ const routes = [
         component: () => import('../views/order/detail.vue')
       },
       {
+        path: 'checkout/:id',
+        name: 'Checkout',
+        component: () => import('../views/order/checkout.vue')
+      },
+      {
         path: 'creator',
         name: 'CreatorDashboard',
         component: () => import('../views/creator/index.vue')
