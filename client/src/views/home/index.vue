@@ -117,10 +117,9 @@ const steps = [
     <nav :class="['nav-bar', { 'nav-scrolled': scrolled }]">
       <div class="nav-inner">
         <a href="/" class="nav-logo">
-          <span class="logo-icon">蒙</span>
+          <img src="../../assets/logo.png" alt="蒙服饰" class="logo-image" />
           <span class="logo-text">蒙古非遗藏品</span>
         </a>
-
         <!-- 桌面端菜单 -->
         <div class="nav-links">
           <a href="#features" @click.prevent="scrollToSection('features')"
@@ -356,7 +355,7 @@ const steps = [
         <div class="footer-grid">
           <div class="footer-brand">
             <a href="/" class="nav-logo" style="margin-bottom: 16px;">
-              <span class="logo-icon">蒙</span>
+              <img src="../../assets/logo.png" alt="蒙服饰" class="logo-image" />
               <span class="logo-text">蒙古非遗藏品</span>
             </a>
             <p class="footer-desc">蒙古族服饰非物质文化遗产数字藏品平台，以数字技术守护民族文化瑰宝。</p>
@@ -469,17 +468,10 @@ a {
   color: var(--text-h);
 }
 
-.logo-icon {
+.logo-image {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #C6893F, #E2B97F);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  object-fit: contain;
 }
 
 .logo-text {
