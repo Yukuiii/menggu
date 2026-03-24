@@ -13,6 +13,8 @@ const userStore = useUserStore()
 
 // 表单数据
 const form = ref({ email: '', password: '' })
+// 登录角色
+const loginRole = ref('user')
 // 控制密码显隐
 const showPassword = ref(false)
 // 加载状态
@@ -31,8 +33,13 @@ const handleLogin = async () => {
   error.value = ''
   try {
     const data = await apiLogin({ email: form.value.email, password: form.value.password })
+    // 校验角色是否匹配
+    if (loginRole.value === 'admin' && data.user.role !== 'admin') {
+      error.value = '该账号不是管理员'
+      return
+    }
     userStore.loginSuccess(data)
-    router.push('/market')
+    router.push(loginRole.value === 'admin' ? '/admin' : '/market')
   } catch (e) {
     error.value = e.message || '账号或密码错误，请重试'
   } finally {
@@ -95,6 +102,18 @@ const handleLogin = async () => {
         </div>
 
         <form @submit.prevent="handleLogin" class="auth-form" novalidate>
+          <!-- 角色选择 -->
+          <div class="role-switch">
+            <label :class="['role-option', { active: loginRole === 'user' }]" @click="loginRole = 'user'">
+              <span class="role-dot"></span>
+              <span>用户登录</span>
+            </label>
+            <label :class="['role-option', { active: loginRole === 'admin' }]" @click="loginRole = 'admin'">
+              <span class="role-dot"></span>
+              <span>管理员登录</span>
+            </label>
+          </div>
+
           <!-- 邮箱 -->
           <div class="form-group" :class="{ 'has-error': form.email && !emailValid }">
             <label class="form-label">邮箱地址</label>
@@ -379,6 +398,58 @@ const handleLogin = async () => {
 
 /* 表单 */
 .auth-form { display: flex; flex-direction: column; gap: 20px; }
+
+/* 角色切换 */
+.role-switch {
+  display: flex;
+  gap: 12px;
+}
+.role-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1.5px solid #f0ebe4;
+  border-radius: 10px;
+  background: #FFFAF4;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  color: #999;
+}
+.role-option:hover {
+  border-color: #C6893F;
+  color: #1a1a2e;
+}
+.role-option.active {
+  border-color: #C6893F;
+  background: #FFF8EE;
+  color: #C6893F;
+  font-weight: 600;
+}
+.role-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.role-option.active .role-dot {
+  border-color: #C6893F;
+}
+.role-option.active .role-dot::after {
+  content: '';
+  position: absolute;
+  top: 2.5px; left: 2.5px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #C6893F;
+}
 
 .form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group.has-error .form-input { border-color: #e03131; }
