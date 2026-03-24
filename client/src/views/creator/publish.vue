@@ -187,15 +187,29 @@ onMounted(() => {
               </div>
             </div>
             
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">文件类型</label>
-                <select v-model="form.fileType" class="form-input select">
-                  <option value="image">图片 (JPG, PNG)</option>
-                  <option value="video">视频 (MP4)</option>
-                  <option value="audio">音频 (MP3, WAV)</option>
-                  <option value="3d">3D 模型 (GLB, GLTF)</option>
-                </select>
+            <div class="form-group">
+              <label class="form-label">文件类型</label>
+              <div class="type-options">
+                <label :class="['type-option', { active: form.fileType === 'image' }]">
+                  <input type="radio" v-model="form.fileType" value="image" />
+                  <span class="type-dot"></span>
+                  <span class="type-text">图片</span>
+                </label>
+                <label :class="['type-option', { active: form.fileType === 'video' }]">
+                  <input type="radio" v-model="form.fileType" value="video" />
+                  <span class="type-dot"></span>
+                  <span class="type-text">视频</span>
+                </label>
+                <label :class="['type-option', { active: form.fileType === 'audio' }]">
+                  <input type="radio" v-model="form.fileType" value="audio" />
+                  <span class="type-dot"></span>
+                  <span class="type-text">音频</span>
+                </label>
+                <label :class="['type-option', { active: form.fileType === '3d' }]">
+                  <input type="radio" v-model="form.fileType" value="3d" />
+                  <span class="type-dot"></span>
+                  <span class="type-text">3D 模型</span>
+                </label>
               </div>
             </div>
           </div>
@@ -435,6 +449,27 @@ onMounted(() => {
   resize: vertical;
   min-height: 120px;
 }
+
+/* 单选框组 */
+.type-options { display: flex; gap: 12px; }
+.type-option {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--bg-soft); cursor: pointer; transition: all 0.2s;
+}
+.type-option:hover { border-color: var(--accent); background: var(--accent-bg); }
+.type-option.active { border-color: var(--accent); background: var(--accent-bg); box-shadow: 0 0 0 3px rgba(198,137,63,0.1); }
+.type-option input { display: none; }
+.type-dot {
+  width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border);
+  flex-shrink: 0; position: relative; transition: all 0.2s;
+}
+.type-option.active .type-dot { border-color: var(--accent); }
+.type-option.active .type-dot::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+}
+.type-text { font-size: 14px; font-weight: 500; color: var(--text-h); }
 
 .help-text {
   font-size: 12px;

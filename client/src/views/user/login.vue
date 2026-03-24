@@ -139,7 +139,6 @@ const handleLogin = async () => {
           <div class="form-group">
             <label class="form-label">
               密码
-              <a href="#" class="form-label-link">忘记密码？</a>
             </label>
             <div class="form-input-wrap">
               <span class="form-icon"><Lock :size="16" /></span>

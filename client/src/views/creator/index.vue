@@ -11,8 +11,11 @@ import {
   ShoppingBag, Send, UserPlus
 } from 'lucide-vue-next'
 import { apiCreatorProfile, apiCreatorStats, apiCreatorWorks, apiCreatorApply } from '../../api/creator'
+import { apiGetProfile } from '../../api/user'
+import { useUserStore } from '../../stores'
 
 const router = useRouter()
+const userStore = useUserStore()
 const activeTab = ref('all')
 
 const tabs = [
@@ -57,6 +60,14 @@ const getFileTypeLabel = (type) => {
 /** 加载创作者信息 */
 const fetchCreatorData = async () => {
   try {
+    // 先检查实名认证状态
+    const userProfile = await apiGetProfile()
+    if (!userProfile.isVerified) {
+      ElMessage.warning('请先完成实名认证后再申请成为创作者')
+      router.replace('/profile')
+      return
+    }
+
     const profile = await apiCreatorProfile()
 
     // 未申请过创作者

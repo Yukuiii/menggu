@@ -29,3 +29,13 @@ export function apiAdminCreatorList(params) {
 export function apiAdminSeriesList(params) {
   return request.get('/admin/series', { params })
 }
+
+/** 审核藏品 */
+export function apiAdminAuditCollection(id, data) {
+  return request.post(`/admin/collections/${id}/audit`, data)
+}
+
+/** 审核创作者 */
+export function apiAdminAuditCreator(id, data) {
+  return request.post(`/admin/creators/${id}/audit`, data)
+}
