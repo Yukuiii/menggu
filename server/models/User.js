@@ -15,6 +15,7 @@ module.exports = (sequelize) => {
     bio: { type: DataTypes.STRING(200), comment: '个人简介' },
     balance: { type: DataTypes.DECIMAL(12, 2), defaultValue: 0.00, comment: '钱包余额' },
     isVerified: { type: DataTypes.BOOLEAN, defaultValue: false, comment: '是否实名认证' },
+    role: { type: DataTypes.STRING(10), defaultValue: 'user', comment: '角色 user普通用户 admin管理员' },
     status: { type: DataTypes.TINYINT, defaultValue: 1, comment: '状态 1正常 0封禁' }
   }, { tableName: 'users', timestamps: true })
 }

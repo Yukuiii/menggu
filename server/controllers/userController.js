@@ -91,7 +91,8 @@ exports.login = async (req, res, next) => {
         nickname: user.nickname,
         avatar: user.avatar,
         walletAddress: user.walletAddress,
-        isVerified: user.isVerified
+        isVerified: user.isVerified,
+        role: user.role
       }
     }, '登录成功')
   } catch (err) { next(err) }

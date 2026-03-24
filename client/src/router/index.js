@@ -35,51 +35,61 @@ const routes = [
       {
         path: 'my-collections',
         name: 'MyCollections',
+        meta: { requiresAuth: true },
         component: () => import('../views/collection/my.vue')
       },
       {
         path: 'my-collection/:id',
         name: 'MyCollectionDetail',
+        meta: { requiresAuth: true },
         component: () => import('../views/collection/my-detail.vue')
       },
       {
         path: 'profile',
         name: 'Profile',
+        meta: { requiresAuth: true },
         component: () => import('../views/user/profile.vue')
       },
       {
         path: 'follows',
         name: 'MyFollows',
+        meta: { requiresAuth: true },
         component: () => import('../views/user/follows.vue')
       },
       {
         path: 'orders',
         name: 'Orders',
+        meta: { requiresAuth: true },
         component: () => import('../views/order/index.vue')
       },
       {
         path: 'order/:id',
         name: 'OrderDetail',
+        meta: { requiresAuth: true },
         component: () => import('../views/order/detail.vue')
       },
       {
         path: 'checkout/:id',
         name: 'Checkout',
+        meta: { requiresAuth: true },
         component: () => import('../views/order/checkout.vue')
       },
       {
         path: 'creator',
         name: 'CreatorDashboard',
+        meta: { requiresAuth: true },
         component: () => import('../views/creator/index.vue')
       },
       {
         path: 'publish',
         name: 'PublishCollection',
+        meta: { requiresAuth: true },
         component: () => import('../views/creator/publish.vue')
       },
       {
         path: 'admin',
         name: 'AdminDashboard',
+        meta: { requiresAuth: true, requiresAdmin: true },
         component: () => import('../views/admin/index.vue')
       }
     ]
@@ -90,6 +100,29 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+/** 路由守卫 */
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  const userInfo = JSON.parse(localStorage.getItem('userInfo') || 'null')
+
+  // 需要登录的页面
+  if (to.meta.requiresAuth && !token) {
+    return next({ name: 'Login', query: { redirect: to.fullPath } })
+  }
+
+  // 需要管理员权限的页面
+  if (to.meta.requiresAdmin && (!userInfo || userInfo.role !== 'admin')) {
+    return next({ name: 'Market' })
+  }
+
+  // 已登录用户访问登录/注册页，跳转到市场
+  if ((to.name === 'Login' || to.name === 'Register') && token) {
+    return next({ name: 'Market' })
+  }
+
+  next()
 })
 
 export default router

@@ -35,6 +35,7 @@ const works = ref([])
 /** 创作者状态：null未申请 / 0审核中 / 1已通过 / 2已拒绝 */
 const creatorStatus = ref(null)
 const applying = ref(false)
+const pageLoading = ref(true)
 
 /** 入驻申请表单 */
 const applyForm = ref({
@@ -97,6 +98,8 @@ const fetchCreatorData = async () => {
     }
   } catch {
     // 加载失败保持默认状态
+  } finally {
+    pageLoading.value = false
   }
 }
 
@@ -145,8 +148,14 @@ const getStatusInfo = (status) => {
     <main class="page-main">
       <div class="main-inner">
 
+        <!-- 加载中 -->
+        <div v-if="pageLoading" class="status-card">
+          <Clock :size="40" style="color: var(--accent); animation: spin 1.5s linear infinite;" />
+          <h2>加载中...</h2>
+        </div>
+
         <!-- ========== 未申请：入驻申请表单 ========== -->
-        <template v-if="creatorStatus === null">
+        <template v-else-if="creatorStatus === null">
           <div class="apply-section">
             <div class="apply-header">
               <UserPlus :size="48" class="apply-icon" />
@@ -161,7 +170,8 @@ const getStatusInfo = (status) => {
               </div>
               <div class="form-group">
                 <label class="form-label">简介</label>
-                <textarea v-model="applyForm.intro" class="form-input textarea" placeholder="介绍您的创作背景和风格..." rows="4"></textarea>
+                <textarea v-model="applyForm.intro" class="form-input textarea" placeholder="介绍您的创作背景和风格..."
+                  rows="4"></textarea>
               </div>
               <div class="form-row">
                 <div class="form-group">
@@ -225,37 +235,49 @@ const getStatusInfo = (status) => {
           <!-- 欢迎区 -->
           <div class="welcome">
             <div class="welcome-text">
-              <h1><Palette :size="32" /> 创作者工作台</h1>
+              <h1>
+                <Palette :size="32" /> 创作者工作台
+              </h1>
               <p>管理你的数字藏品，查看审核状态与收益数据</p>
             </div>
-            <button class="btn-create" @click="router.push('/publish')"><Plus :size="18" /> 发布新藏品</button>
+            <button class="btn-create" @click="router.push('/publish')">
+              <Plus :size="18" /> 发布新藏品
+            </button>
           </div>
 
           <!-- 统计卡片 -->
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-icon" style="background: rgba(198,137,63,0.1);"><Package :size="22" style="color: #C6893F;" /></div>
+              <div class="stat-icon" style="background: rgba(198,137,63,0.1);">
+                <Package :size="22" style="color: #C6893F;" />
+              </div>
               <div class="stat-body">
                 <span class="stat-value">{{ stats.totalWorks }}</span>
                 <span class="stat-label">发布作品</span>
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon" style="background: rgba(32,201,151,0.1);"><ShoppingBag :size="22" style="color: #20C997;" /></div>
+              <div class="stat-icon" style="background: rgba(32,201,151,0.1);">
+                <ShoppingBag :size="22" style="color: #20C997;" />
+              </div>
               <div class="stat-body">
                 <span class="stat-value">{{ stats.totalSales.toLocaleString() }}</span>
                 <span class="stat-label">总销量</span>
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon" style="background: rgba(253,126,20,0.1);"><DollarSign :size="22" style="color: #FD7E14;" /></div>
+              <div class="stat-icon" style="background: rgba(253,126,20,0.1);">
+                <DollarSign :size="22" style="color: #FD7E14;" />
+              </div>
               <div class="stat-body">
                 <span class="stat-value">¥{{ stats.totalRevenue.toLocaleString() }}</span>
                 <span class="stat-label">总收益</span>
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-icon" style="background: rgba(132,94,247,0.1);"><TrendingUp :size="22" style="color: #845EF7;" /></div>
+              <div class="stat-icon" style="background: rgba(132,94,247,0.1);">
+                <TrendingUp :size="22" style="color: #845EF7;" />
+              </div>
               <div class="stat-body">
                 <span class="stat-value">¥{{ stats.avgPrice }}</span>
                 <span class="stat-label">均价</span>
@@ -266,7 +288,8 @@ const getStatusInfo = (status) => {
           <!-- 标签页 -->
           <div class="tabs-bar">
             <div class="tabs">
-              <button v-for="t in tabs" :key="t.key" :class="['tab', { active: activeTab === t.key }]" @click="activeTab = t.key">
+              <button v-for="t in tabs" :key="t.key" :class="['tab', { active: activeTab === t.key }]"
+                @click="activeTab = t.key">
                 {{ t.label }}
               </button>
             </div>
@@ -310,13 +333,19 @@ const getStatusInfo = (status) => {
                   </div>
                 </template>
                 <template v-else-if="work.status === 'draft'">
-                  <button class="btn-edit"><Edit3 :size="14" /> 继续编辑</button>
+                  <button class="btn-edit">
+                    <Edit3 :size="14" /> 继续编辑
+                  </button>
                 </template>
                 <template v-else-if="work.status === 'pending'">
-                  <span class="pending-text"><Clock :size="14" /> 等待审核</span>
+                  <span class="pending-text">
+                    <Clock :size="14" /> 等待审核
+                  </span>
                 </template>
                 <template v-else>
-                  <button class="btn-edit"><Edit3 :size="14" /> 重新提交</button>
+                  <button class="btn-edit">
+                    <Edit3 :size="14" /> 重新提交
+                  </button>
                 </template>
               </div>
             </div>
@@ -326,7 +355,9 @@ const getStatusInfo = (status) => {
             <Palette :size="48" class="empty-icon" />
             <h3>暂无作品</h3>
             <p>开始发布你的第一件数字藏品吧</p>
-            <button class="btn-create-sm" @click="router.push('/publish')"><Plus :size="14" /> 发布藏品</button>
+            <button class="btn-create-sm" @click="router.push('/publish')">
+              <Plus :size="14" /> 发布藏品
+            </button>
           </div>
         </template>
 
@@ -337,50 +368,72 @@ const getStatusInfo = (status) => {
 
 <style scoped>
 .creator-page {
-  --accent: #C6893F; --accent-dark: #A97030; --accent-bg: #FFF8EE;
-  --text-h: #1a1a2e; --text: #555; --text-light: #999;
-  --bg: #FFFCF8; --bg-soft: #FFFAF4; --border: #f0ebe4;
-  --card-bg: #fff; --radius: 16px;
-  min-height: 100vh; background: var(--bg);
+  --accent: #C6893F;
+  --accent-dark: #A97030;
+  --accent-bg: #FFF8EE;
+  --text-h: #1a1a2e;
+  --text: #555;
+  --text-light: #999;
+  --bg: #FFFCF8;
+  --bg-soft: #FFFAF4;
+  --border: #f0ebe4;
+  --card-bg: #fff;
+  --radius: 16px;
+  min-height: 100vh;
+  background: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.page-main { padding: 32px 0 60px; }
-.main-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+.page-main {
+  padding: 32px 0 60px;
+}
+
+.main-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
 
 /* ===== 申请入驻 ===== */
 .apply-section {
   max-width: 640px;
   margin: 0 auto;
 }
+
 .apply-header {
   text-align: center;
   margin-bottom: 36px;
 }
+
 .apply-icon {
   color: var(--accent);
   margin-bottom: 16px;
 }
+
 .apply-header h1 {
   font-size: 28px;
   font-weight: 800;
   color: var(--text-h);
   margin: 0 0 8px;
 }
+
 .apply-header p {
   font-size: 15px;
   color: var(--text);
   margin: 0;
 }
+
 .apply-form {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 32px;
 }
+
 .form-group {
   margin-bottom: 20px;
 }
+
 .form-label {
   display: block;
   font-size: 14px;
@@ -388,6 +441,7 @@ const getStatusInfo = (status) => {
   color: var(--text-h);
   margin-bottom: 8px;
 }
+
 .form-input {
   width: 100%;
   padding: 12px 16px;
@@ -401,12 +455,18 @@ const getStatusInfo = (status) => {
   font-family: inherit;
   box-sizing: border-box;
 }
+
 .form-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(198,137,63,0.1);
+  box-shadow: 0 0 0 3px rgba(198, 137, 63, 0.1);
   background: #fff;
 }
-.form-input.textarea { resize: vertical; min-height: 100px; }
+
+.form-input.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
 .form-input.select {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -421,6 +481,7 @@ const getStatusInfo = (status) => {
   display: flex;
   gap: 12px;
 }
+
 .type-option {
   flex: 1;
   display: flex;
@@ -433,16 +494,22 @@ const getStatusInfo = (status) => {
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .type-option:hover {
   border-color: var(--accent);
   background: var(--accent-bg);
 }
+
 .type-option.active {
   border-color: var(--accent);
   background: var(--accent-bg);
-  box-shadow: 0 0 0 3px rgba(198,137,63,0.1);
+  box-shadow: 0 0 0 3px rgba(198, 137, 63, 0.1);
 }
-.type-option input { display: none; }
+
+.type-option input {
+  display: none;
+}
+
 .type-dot {
   width: 18px;
   height: 18px;
@@ -452,27 +519,37 @@ const getStatusInfo = (status) => {
   position: relative;
   transition: all 0.2s;
 }
+
 .type-option.active .type-dot {
   border-color: var(--accent);
 }
+
 .type-option.active .type-dot::after {
   content: '';
   position: absolute;
-  top: 3px; left: 3px;
-  width: 8px; height: 8px;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--accent);
 }
+
 .type-text {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-h);
 }
+
 .form-row {
   display: flex;
   gap: 20px;
 }
-.form-row .form-group { flex: 1; }
+
+.form-row .form-group {
+  flex: 1;
+}
+
 .btn-apply {
   display: inline-flex;
   align-items: center;
@@ -490,8 +567,15 @@ const getStatusInfo = (status) => {
   width: 100%;
   justify-content: center;
 }
-.btn-apply:hover:not(:disabled) { background: var(--accent-dark); }
-.btn-apply:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-apply:hover:not(:disabled) {
+  background: var(--accent-dark);
+}
+
+.btn-apply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ===== 状态卡片（审核中/已拒绝） ===== */
 .status-card {
@@ -503,89 +587,413 @@ const getStatusInfo = (status) => {
   max-width: 560px;
   margin: 40px auto;
 }
-.status-icon { margin-bottom: 24px; }
-.pending-card .status-icon { color: #FD7E14; }
-.rejected-card .status-icon { color: #e03131; }
+
+.status-icon {
+  margin-bottom: 24px;
+}
+
+.pending-card .status-icon {
+  color: #FD7E14;
+}
+
+.rejected-card .status-icon {
+  color: #e03131;
+}
+
 .status-card h2 {
   font-size: 24px;
   font-weight: 800;
   color: var(--text-h);
   margin: 0 0 12px;
 }
+
 .status-card p {
   font-size: 15px;
   color: var(--text);
   margin: 0 0 28px;
   line-height: 1.6;
 }
+
 .status-card .btn-apply {
   width: auto;
   display: inline-flex;
 }
 
 /* ===== 欢迎区 ===== */
-.welcome { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-.welcome h1 { display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 800; color: var(--text-h); margin: 0 0 8px; }
-.welcome h1 svg { color: var(--accent); }
-.welcome p { font-size: 14px; color: var(--text); margin: 0; }
-.btn-create { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-.btn-create:hover { background: var(--accent-dark); box-shadow: 0 4px 15px rgba(198,137,63,0.3); }
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.welcome h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-h);
+  margin: 0 0 8px;
+}
+
+.welcome h1 svg {
+  color: var(--accent);
+}
+
+.welcome p {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+}
+
+.btn-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-create:hover {
+  background: var(--accent-dark);
+  box-shadow: 0 4px 15px rgba(198, 137, 63, 0.3);
+}
 
 /* 统计 */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-.stat-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
-.stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.stat-body { display: flex; flex-direction: column; }
-.stat-value { font-size: 22px; font-weight: 800; color: var(--text-h); }
-.stat-label { font-size: 12px; color: var(--text-light); }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-h);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-light);
+}
 
 /* 标签 */
-.tabs-bar { border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-.tabs { display: flex; gap: 4px; }
-.tab { padding: 10px 24px; border: none; background: transparent; font-size: 14px; font-weight: 500; color: var(--text-light); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; font-family: inherit; }
-.tab:hover { color: var(--text-h); }
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tabs-bar {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  padding: 10px 24px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.tab:hover {
+  color: var(--text-h);
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
 
 /* 作品列表 */
-.works-list { display: flex; flex-direction: column; gap: 16px; }
-.work-card { display: flex; align-items: center; gap: 20px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); transition: all 0.2s; }
-.work-card:hover { box-shadow: 0 4px 20px rgba(198,137,63,0.08); border-color: transparent; }
-.work-img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
-.work-info { flex: 1; min-width: 0; }
-.work-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.work-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
-.ws-draft { background: rgba(153,153,153,0.1); color: #999; }
-.ws-pending { background: rgba(253,126,20,0.1); color: #FD7E14; }
-.ws-approved { background: rgba(32,201,151,0.1); color: #20C997; }
-.ws-rejected { background: rgba(224,49,49,0.1); color: #e03131; }
-.work-cat { font-size: 11px; color: var(--text-light); padding: 2px 8px; border-radius: 4px; background: var(--bg-soft); }
-.work-name { font-size: 16px; font-weight: 700; color: var(--text-h); margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.work-meta { display: flex; gap: 16px; font-size: 12px; color: var(--text-light); }
-.work-reject { margin-top: 8px; padding: 8px 12px; border-radius: 8px; background: #fff5f5; font-size: 12px; color: #e03131; display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
-.work-reject svg { flex-shrink: 0; margin-top: 2px; }
+.works-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-.work-stats { display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
-.ws-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; }
-.ws-value { font-size: 16px; font-weight: 800; color: var(--text-h); }
-.ws-label { font-size: 11px; color: var(--text-light); }
-.pending-text { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #FD7E14; font-weight: 600; }
-.btn-edit { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--card-bg); font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.2s; font-family: inherit; }
-.btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+.work-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.work-card:hover {
+  box-shadow: 0 4px 20px rgba(198, 137, 63, 0.08);
+  border-color: transparent;
+}
+
+.work-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.work-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.work-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.work-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ws-draft {
+  background: rgba(153, 153, 153, 0.1);
+  color: #999;
+}
+
+.ws-pending {
+  background: rgba(253, 126, 20, 0.1);
+  color: #FD7E14;
+}
+
+.ws-approved {
+  background: rgba(32, 201, 151, 0.1);
+  color: #20C997;
+}
+
+.ws-rejected {
+  background: rgba(224, 49, 49, 0.1);
+  color: #e03131;
+}
+
+.work-cat {
+  font-size: 11px;
+  color: var(--text-light);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg-soft);
+}
+
+.work-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.work-reject {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fff5f5;
+  font-size: 12px;
+  color: #e03131;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.work-reject svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.work-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.ws-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.ws-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-h);
+}
+
+.ws-label {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.pending-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #FD7E14;
+  font-weight: 600;
+}
+
+.btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-edit:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 /* 空状态 */
-.empty { text-align: center; padding: 80px 20px; }
-.empty-icon { color: var(--border); margin-bottom: 16px; }
-.empty h3 { font-size: 18px; font-weight: 700; color: var(--text-h); margin: 0 0 8px; }
-.empty p { font-size: 14px; color: var(--text-light); margin: 0 0 24px; }
-.btn-create-sm { display: inline-flex; align-items: center; gap: 6px; padding: 10px 24px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; border: none; cursor: pointer; font-family: inherit; }
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+}
 
-@media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+.empty-icon {
+  color: var(--border);
+  margin-bottom: 16px;
+}
+
+.empty h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0 0 8px;
+}
+
+.empty p {
+  font-size: 14px;
+  color: var(--text-light);
+  margin: 0 0 24px;
+}
+
+.btn-create-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .main-inner { padding-left: 20px; padding-right: 20px; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .welcome { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .work-card { flex-wrap: wrap; }
-  .work-stats { width: 100%; justify-content: flex-start; gap: 16px; margin-top: 8px; }
-  .form-row { flex-direction: column; gap: 0; }
+  .main-inner {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .welcome {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .work-card {
+    flex-wrap: wrap;
+  }
+
+  .work-stats {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 </style>

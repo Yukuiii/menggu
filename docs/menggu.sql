@@ -21,6 +21,7 @@ CREATE TABLE `users` (
   `real_name` VARCHAR(50) DEFAULT NULL COMMENT '真实姓名（加密存储）',
   `id_card` VARCHAR(18) DEFAULT NULL COMMENT '身份证号（加密存储）',
   `is_verified` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否实名认证 0否 1是',
+  `role` VARCHAR(10) NOT NULL DEFAULT 'user' COMMENT '角色 user普通用户 admin管理员',
   `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 0封禁 1正常',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -260,3 +261,9 @@ CREATE TABLE `follows` (
   UNIQUE KEY `uk_user_creator` (`user_id`, `creator_id`),
   KEY `idx_creator_id` (`creator_id`)
 ) ENGINE=InnoDB COMMENT='关注关系表';
+
+-- ----------------------------
+-- 初始化管理员账号（密码: 123456）
+-- ----------------------------
+INSERT INTO `users` (`email`, `password`, `nickname`, `wallet_address`, `balance`, `is_verified`, `role`, `status`)
+VALUES ('admin@qq.com', '$2b$10$AbZGZhCbkw9tuwlFwU.YNeIJFCYH2AphWe41oGtLFvLgaWghyaMHi', '管理员', '0xADMIN0000000000000000000000000000000000', 0.00, 1, 'admin', 1);
