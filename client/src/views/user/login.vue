@@ -38,6 +38,10 @@ const handleLogin = async () => {
       error.value = '该账号不是管理员'
       return
     }
+    if (loginRole.value === 'user' && data.user.role === 'admin') {
+      error.value = '管理员请选择管理员登录'
+      return
+    }
     userStore.loginSuccess(data)
     router.push(loginRole.value === 'admin' ? '/admin' : '/market')
   } catch (e) {

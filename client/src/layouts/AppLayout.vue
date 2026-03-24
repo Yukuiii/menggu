@@ -5,7 +5,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores'
-import { Menu, X, User, LogOut } from 'lucide-vue-next'
+import { Menu, X, User, LogOut, Shield } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -13,6 +13,8 @@ const navOpen = ref(false)
 
 /** 是否已登录 */
 const isLoggedIn = computed(() => !!userStore.token)
+/** 是否是管理员 */
+const isAdmin = computed(() => userStore.userInfo?.role === 'admin')
 
 /** 退出登录 */
 const handleLogout = () => {
@@ -36,6 +38,7 @@ const handleLogout = () => {
           <router-link to="/my-collections" class="nav-link">我的藏品</router-link>
           <router-link to="/orders" class="nav-link">我的订单</router-link>
           <router-link to="/creator" class="nav-link">创作者</router-link>
+          <router-link v-if="isAdmin" to="/admin" class="nav-link nav-link-admin"><Shield :size="14" /> 管理后台</router-link>
         </div>
 
         <!-- 右侧操作 -->
@@ -68,6 +71,7 @@ const handleLogout = () => {
         <router-link to="/my-collections" class="nav-mobile-link" @click="navOpen = false">我的藏品</router-link>
         <router-link to="/orders" class="nav-mobile-link" @click="navOpen = false">我的订单</router-link>
         <router-link to="/creator" class="nav-mobile-link" @click="navOpen = false">创作者</router-link>
+        <router-link v-if="isAdmin" to="/admin" class="nav-mobile-link" @click="navOpen = false">管理后台</router-link>
         <template v-if="isLoggedIn">
           <router-link to="/profile" class="nav-mobile-link" @click="navOpen = false">个人中心</router-link>
         </template>
@@ -169,6 +173,16 @@ const handleLogout = () => {
   height: 2px;
   background: var(--accent);
   border-radius: 1px;
+}
+
+.nav-link-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-link-admin:hover,
+.nav-link-admin.router-link-active {
+  color: var(--accent);
 }
 
 /* 右侧操作 */
