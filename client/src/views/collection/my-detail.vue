@@ -45,7 +45,7 @@ const fetchMyCollectionDetail = async () => {
     id: data.id,
     tokenId: data.tokenId,
     acquireType: data.acquireType,
-    acquireTime: data.acquireTime,
+    acquireTime: data.acquireTime ? new Date(data.acquireTime).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
     isTransferable: data.isTransferable,
     transferCooldownAt: data.transferCooldownAt,
     chainHash: data.chainHash,
@@ -67,7 +67,7 @@ const fetchMyCollectionDetail = async () => {
     action: item.type === 'gift' ? '转赠' : (item.type === 'mint' ? '铸造' : '购买'),
     from: item.fromUser?.nickname || '',
     to: item.toUser?.nickname || '我',
-    time: item.createdAt,
+    time: item.createdAt ? new Date(item.createdAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
     hash: item.chainHash ? `${item.chainHash.slice(0, 10)}...${item.chainHash.slice(-8)}` : '-'
   }))
 }
@@ -168,9 +168,9 @@ onMounted(() => {
               <span>{{ userCol.acquireTime }}</span>
             </li>
             <li>
-              <span>智能合约</span>
+              <span>合约地址</span>
               <span class="mono">
-                {{ userCol.collection.contractAddress }}
+                {{ userCol.collection.contractAddress.slice(0, 10) }}...{{ userCol.collection.contractAddress.slice(-8) }}
                 <button class="btn-copy" @click="copyText(userCol.collection.contractAddress, 'contract')">
                   <CheckCircle v-if="copied === 'contract'" :size="14" class="copied" />
                   <Copy v-else :size="14" />
