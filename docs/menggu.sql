@@ -230,3 +230,30 @@ CREATE TABLE `announcements` (
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='系统公告表';
+
+-- ----------------------------
+-- 藏品预约表
+-- ----------------------------
+CREATE TABLE `subscriptions` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '预约ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
+  `collection_id` INT UNSIGNED NOT NULL COMMENT '藏品ID',
+  `notified` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否已发送提醒',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_collection` (`user_id`, `collection_id`),
+  KEY `idx_collection_id` (`collection_id`)
+) ENGINE=InnoDB COMMENT='藏品预约表';
+
+-- ----------------------------
+-- 关注关系表
+-- ----------------------------
+CREATE TABLE `follows` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '关注ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '关注者用户ID',
+  `creator_id` INT UNSIGNED NOT NULL COMMENT '被关注创作者ID',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_creator` (`user_id`, `creator_id`),
+  KEY `idx_creator_id` (`creator_id`)
+) ENGINE=InnoDB COMMENT='关注关系表';

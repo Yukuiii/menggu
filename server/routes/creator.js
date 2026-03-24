@@ -5,5 +5,8 @@ const auth = require('../middlewares/auth')
 router.post('/apply', auth, creatorController.apply)
 router.get('/profile', auth, creatorController.profile)
 router.get('/stats', auth, creatorController.stats)
+router.get('/works', auth, creatorController.works)
+router.post('/publish', auth, creatorController.publish)
+router.post('/series', auth, creatorController.createSeries)
 
 module.exports = router
