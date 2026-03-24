@@ -32,7 +32,6 @@ const handleLogout = () => {
 
         <!-- 桌面端菜单 -->
         <div class="nav-links">
-          <router-link to="/" class="nav-link">首页</router-link>
           <router-link to="/market" class="nav-link">藏品市场</router-link>
           <router-link to="/my-collections" class="nav-link">我的藏品</router-link>
           <router-link to="/orders" class="nav-link">我的订单</router-link>
@@ -65,7 +64,6 @@ const handleLogout = () => {
 
       <!-- 移动端菜单 -->
       <div v-if="navOpen" class="nav-mobile">
-        <router-link to="/" class="nav-mobile-link" @click="navOpen = false">首页</router-link>
         <router-link to="/market" class="nav-mobile-link" @click="navOpen = false">藏品市场</router-link>
         <router-link to="/my-collections" class="nav-mobile-link" @click="navOpen = false">我的藏品</router-link>
         <router-link to="/orders" class="nav-mobile-link" @click="navOpen = false">我的订单</router-link>
