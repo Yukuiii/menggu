@@ -10,7 +10,9 @@ USE `menggu`;
 -- ----------------------------
 CREATE TABLE `users` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `phone` VARCHAR(11) NOT NULL COMMENT '手机号',
+  `email` VARCHAR(100) NOT NULL COMMENT '邮箱（登录账号）',
+  `password` VARCHAR(100) NOT NULL COMMENT '密码（bcrypt加密）',
+  `phone` VARCHAR(11) DEFAULT NULL COMMENT '手机号',
   `nickname` VARCHAR(50) DEFAULT NULL COMMENT '昵称',
   `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像URL',
   `bio` VARCHAR(200) DEFAULT NULL COMMENT '个人简介',
@@ -23,6 +25,7 @@ CREATE TABLE `users` (
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_email` (`email`),
   UNIQUE KEY `uk_phone` (`phone`),
   UNIQUE KEY `uk_wallet` (`wallet_address`)
 ) ENGINE=InnoDB COMMENT='用户表';

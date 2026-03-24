@@ -18,9 +18,11 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use('/api', routes)
 
 // 全局错误处理
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({ code: 1, message: '服务器内部错误', data: null })
+app.use((err, _req, res, _next) => {
+  console.error('==================== ERROR ====================')
+  console.error(err)
+  console.error('===============================================')
+  res.status(500).json({ code: 1, message: err.message || '服务器内部错误', data: null })
 })
 
 app.listen(PORT, () => {
