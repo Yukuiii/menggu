@@ -98,14 +98,14 @@ exports.publish = async (req, res, next) => {
       return fail(res, '仅认证创作者可发布藏品')
     }
 
-    const { name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, description } = req.body
+    const { name, cover, fileUrl, fileType, category, price, totalSupply, limitPerUser, description } = req.body
 
     if (!name || !cover || !price || !totalSupply) {
       return fail(res, '请填写完整藏品信息')
     }
 
     const collection = await Collection.create({
-      name, cover, fileUrl, fileType: fileType || 'image',
+      name, cover, fileUrl, fileType: fileType || 'image', category,
       creatorId: creator.id, totalSupply, price, limitPerUser: limitPerUser || 1,
       description, status: 1 // 审核中
     })

@@ -88,6 +88,7 @@ const handleSubmit = async () => {
       cover: form.value.coverUrl,
       fileUrl: form.value.fileUrl,
       fileType: form.value.fileType,
+      category: form.value.category,
       price: form.value.price,
       totalSupply: form.value.totalSupply,
       limitPerUser: form.value.limitPerUser || 1,

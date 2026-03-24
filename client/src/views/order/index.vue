@@ -28,8 +28,8 @@ const fetchOrders = async () => {
     id: item.id,
     orderNo: item.orderNo,
     status: item.status === 0 ? 'pending' : item.status === 1 || item.status === 2 ? 'paid' : 'cancelled',
-    time: item.createdAt,
-    payTime: item.paidAt,
+    time: item.createdAt ? new Date(item.createdAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
+    payTime: item.paidAt ? new Date(item.paidAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '',
     collection: {
       id: item.Collection?.id,
       name: item.Collection?.name || '-',

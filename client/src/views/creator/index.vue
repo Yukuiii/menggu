@@ -96,7 +96,10 @@ const fetchCreatorData = async () => {
         id: item.id,
         name: item.name,
         cover: item.cover || '',
-        status: item.status === 0 ? 'draft' : item.status === 1 ? 'pending' : item.status === 2 ? 'approved' : 'rejected',
+        status: (() => {
+          const m = { 0: 'draft', 1: 'pending', 2: 'approved', 3: 'rejected', 5: 'selling', 6: 'soldout', 7: 'offline' }
+          return m[item.status] || 'draft'
+        })(),
         category: getFileTypeLabel(item.fileType),
         price: Number(item.price || 0),
         totalSupply: Number(item.totalSupply || 0),
@@ -147,7 +150,10 @@ const getStatusInfo = (status) => {
     draft: { label: '草稿', class: 'ws-draft', icon: Edit3 },
     pending: { label: '审核中', class: 'ws-pending', icon: Clock },
     approved: { label: '已通过', class: 'ws-approved', icon: CheckCircle },
-    rejected: { label: '已拒绝', class: 'ws-rejected', icon: XCircle }
+    rejected: { label: '已拒绝', class: 'ws-rejected', icon: XCircle },
+    selling: { label: '发售中', class: 'ws-selling', icon: CheckCircle },
+    soldout: { label: '已售罄', class: 'ws-soldout', icon: CheckCircle },
+    offline: { label: '已下架', class: 'ws-offline', icon: XCircle }
   }
   return map[status] || map.draft
 }
@@ -327,7 +333,7 @@ const getStatusInfo = (status) => {
                 </div>
               </div>
               <div class="work-stats">
-                <template v-if="work.status === 'approved'">
+                <template v-if="['approved', 'selling', 'soldout', 'offline'].includes(work.status)">
                   <div class="ws-item">
                     <span class="ws-value">¥{{ work.price.toFixed(2) }}</span>
                     <span class="ws-label">单价</span>
@@ -826,6 +832,21 @@ const getStatusInfo = (status) => {
 .ws-rejected {
   background: rgba(224, 49, 49, 0.1);
   color: #e03131;
+}
+
+.ws-selling {
+  background: rgba(32, 201, 151, 0.1);
+  color: #20C997;
+}
+
+.ws-soldout {
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+
+.ws-offline {
+  background: rgba(153, 153, 153, 0.1);
+  color: #999;
 }
 
 .work-cat {

@@ -87,7 +87,7 @@ const fetchCollectionDetail = async () => {
       type: t.type,
       from: t.fromUser?.nickname || '平台铸造',
       to: t.toUser?.nickname || '-',
-      time: t.createdAt,
+      time: t.createdAt ? new Date(t.createdAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
       hash: t.chainHash || '-'
     }))
   }

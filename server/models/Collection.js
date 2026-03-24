@@ -8,6 +8,7 @@ module.exports = (sequelize) => {
     cover: { type: DataTypes.STRING(255), comment: '封面图' },
     fileUrl: { type: DataTypes.STRING(255), comment: '藏品原始文件URL' },
     fileType: { type: DataTypes.ENUM('image', 'audio', 'video', '3d'), defaultValue: 'image', comment: '文件类型' },
+    category: { type: DataTypes.STRING(20), comment: '藏品分类' },
     creatorId: { type: DataTypes.INTEGER, comment: '所属创作者ID' },
     totalSupply: { type: DataTypes.INTEGER, comment: '发行总量' },
     currentNo: { type: DataTypes.INTEGER, defaultValue: 0, comment: '当前已售编号' },

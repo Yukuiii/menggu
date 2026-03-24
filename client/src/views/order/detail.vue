@@ -48,8 +48,8 @@ const fetchOrder = async () => {
     id: data.id,
     orderNo: data.orderNo,
     status: data.status === 0 ? 'pending' : data.status === 1 || data.status === 2 ? 'paid' : 'cancelled',
-    createTime: data.createdAt,
-    payTime: data.paidAt,
+    createTime: data.createdAt ? new Date(data.createdAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
+    payTime: data.paidAt ? new Date(data.paidAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '',
     payMethod: data.status === 1 || data.status === 2 ? '钱包余额支付' : '',
     collection: {
       id: data.Collection?.id,

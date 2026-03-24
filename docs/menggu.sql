@@ -90,6 +90,7 @@ CREATE TABLE `collections` (
   `cover` VARCHAR(255) NOT NULL COMMENT '封面图',
   `file_url` VARCHAR(255) DEFAULT NULL COMMENT '藏品原始文件URL',
   `file_type` ENUM('image','audio','video','3d') NOT NULL DEFAULT 'image' COMMENT '文件类型',
+  `category` VARCHAR(20) DEFAULT NULL COMMENT '藏品分类（服饰图鉴/纹样艺术/工艺实拍/3D模型等）',
   `creator_id` INT UNSIGNED NOT NULL COMMENT '所属创作者ID',
   `total_supply` INT UNSIGNED NOT NULL COMMENT '发行总量',
   `current_no` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前已售编号',

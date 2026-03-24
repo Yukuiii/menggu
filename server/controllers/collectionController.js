@@ -94,7 +94,7 @@ exports.detail = async (req, res, next) => {
 /** 创建藏品（创作者调用，提交审核） */
 exports.create = async (req, res, next) => {
   try {
-    const { name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, description } = req.body
+    const { name, cover, fileUrl, fileType, category, price, totalSupply, limitPerUser, description } = req.body
 
     if (!name || !cover || !price || !totalSupply) {
       return fail(res, '请填写完整藏品信息')
@@ -107,7 +107,7 @@ exports.create = async (req, res, next) => {
     }
 
     const collection = await Collection.create({
-      name, cover, fileUrl, fileType: fileType || 'image',
+      name, cover, fileUrl, fileType: fileType || 'image', category,
       creatorId: creator.id, totalSupply, price, limitPerUser: limitPerUser || 1,
       description, status: 1 // 审核中
     })
