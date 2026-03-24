@@ -8,7 +8,7 @@ exports.follow = async (req, res, next) => {
     if (!creatorId) return fail(res, '请指定创作者')
 
     const creator = await Creator.findByPk(creatorId)
-    if (!creator || creator.status !== 1) return fail(res, '创作者不存在', 1, 404)
+    if (!creator || creator.status !== 1) return fail(res, '创作者不存在')
     if (creator.userId === req.userId) return fail(res, '不能关注自己')
 
     // 检查是否已关注

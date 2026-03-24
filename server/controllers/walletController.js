@@ -7,7 +7,7 @@ exports.balance = async (req, res, next) => {
     const user = await User.findByPk(req.userId, {
       attributes: ['walletAddress', 'balance']
     })
-    if (!user) return fail(res, '用户不存在', 1, 404)
+    if (!user) return fail(res, '用户不存在')
     success(res, { address: user.walletAddress, balance: user.balance })
   } catch (err) { next(err) }
 }

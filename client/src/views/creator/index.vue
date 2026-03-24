@@ -39,33 +39,39 @@ const getFileTypeLabel = (type) => {
   return '-'
 }
 
+const isCreator = ref(false)
+
 const fetchCreatorData = async () => {
-  const [statsData, worksData] = await Promise.all([
-    apiCreatorStats(),
-    apiCreatorWorks({ page: 1, limit: 100 })
-  ])
-  stats.value = {
-    totalWorks: Number(statsData.worksCount || 0),
-    totalSales: Number(statsData.totalSales || 0),
-    totalRevenue: Number(statsData.totalRevenue || 0),
-    avgPrice: Number(statsData.totalSales || 0) > 0
-      ? (Number(statsData.totalRevenue || 0) / Number(statsData.totalSales || 0)).toFixed(2)
-      : 0
+  try {
+    const [statsData, worksData] = await Promise.all([
+      apiCreatorStats(),
+      apiCreatorWorks({ page: 1, limit: 100 })
+    ])
+    stats.value = {
+      totalWorks: Number(statsData.worksCount || 0),
+      totalSales: Number(statsData.totalSales || 0),
+      totalRevenue: Number(statsData.totalRevenue || 0),
+      avgPrice: Number(statsData.totalSales || 0) > 0
+        ? (Number(statsData.totalRevenue || 0) / Number(statsData.totalSales || 0)).toFixed(2)
+        : 0
+    }
+    works.value = (worksData.list || []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      cover: item.cover || '',
+      status: item.status === 0 ? 'draft' : item.status === 1 ? 'pending' : item.status === 2 ? 'approved' : 'rejected',
+      category: getFileTypeLabel(item.fileType),
+      seriesName: item.Series?.name || '-',
+      price: Number(item.price || 0),
+      totalSupply: Number(item.totalSupply || 0),
+      sold: Number(item.currentNo || 0),
+      createTime: item.createdAt ? item.createdAt.slice(0, 10) : '',
+      approveTime: item.updatedAt ? item.updatedAt.slice(0, 10) : '',
+      rejectReason: item.rejectReason || ''
+    }))
+  } catch {
+    // 用户还不是创作者，保持默认空数据
   }
-  works.value = (worksData.list || []).map((item) => ({
-    id: item.id,
-    name: item.name,
-    cover: item.cover || '',
-    status: item.status === 0 ? 'draft' : item.status === 1 ? 'pending' : item.status === 2 ? 'approved' : 'rejected',
-    category: getFileTypeLabel(item.fileType),
-    seriesName: item.Series?.name || '-',
-    price: Number(item.price || 0),
-    totalSupply: Number(item.totalSupply || 0),
-    sold: Number(item.currentNo || 0),
-    createTime: item.createdAt ? item.createdAt.slice(0, 10) : '',
-    approveTime: item.updatedAt ? item.updatedAt.slice(0, 10) : '',
-    rejectReason: item.rejectReason || ''
-  }))
 }
 
 onMounted(() => {

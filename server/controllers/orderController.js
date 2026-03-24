@@ -16,7 +16,7 @@ exports.create = async (req, res, next) => {
 
     // 校验藏品状态
     const collection = await Collection.findByPk(collectionId)
-    if (!collection) return fail(res, '藏品不存在', 1, 404)
+    if (!collection) return fail(res, '藏品不存在')
     if (collection.status !== 5) return fail(res, '该藏品当前不可购买')
 
     // 校验库存
@@ -66,7 +66,7 @@ exports.pay = async (req, res, next) => {
     const order = await Order.findByPk(req.params.id, { lock: true, transaction: t })
     if (!order || order.userId !== req.userId) {
       await t.rollback()
-      return fail(res, '订单不存在', 1, 404)
+      return fail(res, '订单不存在')
     }
     if (order.status !== 0) {
       await t.rollback()
@@ -248,8 +248,8 @@ exports.detail = async (req, res, next) => {
       ]
     })
 
-    if (!order) return fail(res, '订单不存在', 1, 404)
-    if (order.userId !== req.userId) return fail(res, '无权查看此订单', 1, 403)
+    if (!order) return fail(res, '订单不存在')
+    if (order.userId !== req.userId) return fail(res, '无权查看此订单')
 
     // 运行时自动过期
     if (order.status === 0 && order.expireAt && new Date() > new Date(order.expireAt)) {

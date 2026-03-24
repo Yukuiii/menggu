@@ -105,7 +105,7 @@ exports.getProfile = async (req, res, next) => {
       attributes: { exclude: ['password'] }
     })
     if (!user) {
-      return fail(res, '用户不存在', 1, 404)
+      return fail(res, '用户不存在')
     }
     success(res, user)
   } catch (err) { next(err) }

@@ -101,7 +101,7 @@ exports.detail = async (req, res, next) => {
       }]
     })
 
-    if (!collection) return fail(res, '藏品不存在', 1, 404)
+    if (!collection) return fail(res, '藏品不存在')
 
     // 运行时自动更新发售状态，并触发预约提醒
     if (collection.status === 4 && new Date(collection.saleTime) <= new Date()) {
@@ -135,11 +135,11 @@ exports.create = async (req, res, next) => {
 
     // 校验系列归属
     const series = await Series.findByPk(seriesId, { include: [Creator] })
-    if (!series) return fail(res, '系列不存在', 1, 404)
+    if (!series) return fail(res, '系列不存在')
 
     const creator = series.Creator
     if (!creator || creator.userId !== req.userId || creator.status !== 1) {
-      return fail(res, '无权在该系列下创建藏品', 1, 403)
+      return fail(res, '无权在该系列下创建藏品')
     }
 
     const collection = await Collection.create({

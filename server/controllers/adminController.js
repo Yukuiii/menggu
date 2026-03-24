@@ -57,7 +57,7 @@ exports.userDetail = async (req, res, next) => {
     const user = await User.findByPk(req.params.id, {
       attributes: { exclude: ['password'] }
     })
-    if (!user) return fail(res, '用户不存在', 1, 404)
+    if (!user) return fail(res, '用户不存在')
 
     // 并发查询持有藏品和订单记录
     const [collections, orders] = await Promise.all([
@@ -83,7 +83,7 @@ exports.userDetail = async (req, res, next) => {
 exports.toggleUserStatus = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id)
-    if (!user) return fail(res, '用户不存在', 1, 404)
+    if (!user) return fail(res, '用户不存在')
 
     const newStatus = user.status === 1 ? 0 : 1
     await user.update({ status: newStatus })
@@ -108,7 +108,7 @@ exports.auditCollection = async (req, res, next) => {
       include: [{ model: Series, include: [{ model: Creator, include: [User] }] }]
     })
 
-    if (!collection) return fail(res, '藏品不存在', 1, 404)
+    if (!collection) return fail(res, '藏品不存在')
     if (collection.status !== 1) return fail(res, '该藏品不在待审核状态')
 
     if (action === 'approve') {
@@ -159,7 +159,7 @@ exports.toggleCollectionStatus = async (req, res, next) => {
   try {
     const { action } = req.body
     const collection = await Collection.findByPk(req.params.id)
-    if (!collection) return fail(res, '藏品不存在', 1, 404)
+    if (!collection) return fail(res, '藏品不存在')
 
     if (action === 'online') {
       // 上架：仅已通过的藏品可上架
@@ -274,7 +274,7 @@ exports.refundOrder = async (req, res, next) => {
       lock: true, transaction: t,
       include: [{ model: Collection }]
     })
-    if (!order) { await t.rollback(); return fail(res, '订单不存在', 1, 404) }
+    if (!order) { await t.rollback(); return fail(res, '订单不存在') }
     if (order.status !== 1) { await t.rollback(); return fail(res, '仅已支付订单可退款') }
 
     // 退还用户余额
@@ -319,7 +319,7 @@ exports.auditCreator = async (req, res, next) => {
     const { action, rejectReason } = req.body
     const creator = await Creator.findByPk(req.params.id)
 
-    if (!creator) return fail(res, '创作者不存在', 1, 404)
+    if (!creator) return fail(res, '创作者不存在')
     if (creator.status !== 0) return fail(res, '该创作者不在待审核状态')
 
     if (action === 'approve') {
@@ -401,7 +401,7 @@ exports.createAnnouncement = async (req, res, next) => {
 exports.updateAnnouncement = async (req, res, next) => {
   try {
     const announcement = await Announcement.findByPk(req.params.id)
-    if (!announcement) return fail(res, '公告不存在', 1, 404)
+    if (!announcement) return fail(res, '公告不存在')
     const { title, content, isActive } = req.body
     await announcement.update({ title, content, isActive })
     success(res, announcement, '公告更新成功')
@@ -412,7 +412,7 @@ exports.updateAnnouncement = async (req, res, next) => {
 exports.deleteAnnouncement = async (req, res, next) => {
   try {
     const announcement = await Announcement.findByPk(req.params.id)
-    if (!announcement) return fail(res, '公告不存在', 1, 404)
+    if (!announcement) return fail(res, '公告不存在')
     await announcement.destroy()
     success(res, null, '公告已删除')
   } catch (err) { next(err) }

@@ -48,7 +48,7 @@ exports.profile = async (req, res, next) => {
 exports.stats = async (req, res, next) => {
   try {
     const creator = await Creator.findOne({ where: { userId: req.userId } })
-    if (!creator) return fail(res, '您还不是创作者', 1, 404)
+    if (!creator) return fail(res, '您还不是创作者')
 
     success(res, {
       totalSales: creator.totalSales,
@@ -64,7 +64,7 @@ exports.stats = async (req, res, next) => {
 exports.works = async (req, res, next) => {
   try {
     const creator = await Creator.findOne({ where: { userId: req.userId } })
-    if (!creator) return fail(res, '您还不是创作者', 1, 404)
+    if (!creator) return fail(res, '您还不是创作者')
 
     const { status, page = 1, limit = 10 } = req.query
     const where = {}
@@ -109,7 +109,7 @@ exports.publish = async (req, res, next) => {
   try {
     const creator = await Creator.findOne({ where: { userId: req.userId } })
     if (!creator || creator.status !== 1) {
-      return fail(res, '仅认证创作者可发布藏品', 1, 403)
+      return fail(res, '仅认证创作者可发布藏品')
     }
 
     const { seriesId, name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, saleTime, description } = req.body
@@ -121,7 +121,7 @@ exports.publish = async (req, res, next) => {
     // 校验系列归属
     const series = await Series.findByPk(seriesId)
     if (!series || series.creatorId !== creator.id) {
-      return fail(res, '系列不存在或无权操作', 1, 403)
+      return fail(res, '系列不存在或无权操作')
     }
 
     const collection = await Collection.create({
@@ -141,7 +141,7 @@ exports.createSeries = async (req, res, next) => {
   try {
     const creator = await Creator.findOne({ where: { userId: req.userId } })
     if (!creator || creator.status !== 1) {
-      return fail(res, '仅认证创作者可创建系列', 1, 403)
+      return fail(res, '仅认证创作者可创建系列')
     }
 
     const { name, cover, description } = req.body

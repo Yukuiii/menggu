@@ -8,7 +8,7 @@ exports.subscribe = async (req, res, next) => {
     if (!collectionId) return fail(res, '请指定藏品')
 
     const collection = await Collection.findByPk(collectionId)
-    if (!collection) return fail(res, '藏品不存在', 1, 404)
+    if (!collection) return fail(res, '藏品不存在')
     if (collection.status !== 4) return fail(res, '该藏品不在待发售状态，无需预约')
 
     // 检查是否已预约

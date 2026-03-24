@@ -53,8 +53,8 @@ exports.detail = async (req, res, next) => {
       }]
     })
 
-    if (!uc) return fail(res, '藏品记录不存在', 1, 404)
-    if (uc.userId !== req.userId) return fail(res, '无权查看', 1, 403)
+    if (!uc) return fail(res, '藏品记录不存在')
+    if (uc.userId !== req.userId) return fail(res, '无权查看')
 
     // 自动更新可转赠状态
     if (!uc.isTransferable && uc.transferCooldownAt && new Date() >= new Date(uc.transferCooldownAt)) {
@@ -90,7 +90,7 @@ exports.transfer = async (req, res, next) => {
     const uc = await UserCollection.findByPk(req.params.id, { lock: true, transaction: t })
     if (!uc || uc.userId !== req.userId) {
       await t.rollback()
-      return fail(res, '藏品记录不存在', 1, 404)
+      return fail(res, '藏品记录不存在')
     }
 
     // 校验冷却期
@@ -162,8 +162,8 @@ exports.download = async (req, res, next) => {
       include: [{ model: Collection, attributes: ['fileUrl', 'name'] }]
     })
 
-    if (!uc) return fail(res, '藏品记录不存在', 1, 404)
-    if (uc.userId !== req.userId) return fail(res, '无权下载', 1, 403)
+    if (!uc) return fail(res, '藏品记录不存在')
+    if (uc.userId !== req.userId) return fail(res, '无权下载')
 
     const fileUrl = uc.Collection?.fileUrl
     if (!fileUrl) return fail(res, '该藏品暂无原始文件')
