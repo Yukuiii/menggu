@@ -37,6 +37,7 @@ const works = ref([])
 
 /** 创作者状态：null未申请 / 0审核中 / 1已通过 / 2已拒绝 */
 const creatorStatus = ref(null)
+const commissionRate = ref(0)
 const applying = ref(false)
 const pageLoading = ref(true)
 
@@ -77,6 +78,7 @@ const fetchCreatorData = async () => {
     }
 
     creatorStatus.value = profile.status
+    commissionRate.value = parseFloat(profile.commissionRate || 0)
 
     // 只有审核通过才加载统计和作品
     if (profile.status === 1) {
@@ -343,7 +345,7 @@ const getStatusInfo = (status) => {
                     <span class="ws-label">已售/总量</span>
                   </div>
                   <div class="ws-item">
-                    <span class="ws-value">¥{{ (work.sold * work.price).toLocaleString() }}</span>
+                    <span class="ws-value">¥{{ (work.sold * work.price * commissionRate / 100).toFixed(2) }}</span>
                     <span class="ws-label">收益</span>
                   </div>
                 </template>
