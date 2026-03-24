@@ -95,7 +95,6 @@ CREATE TABLE `collections` (
   `total_supply` INT UNSIGNED NOT NULL COMMENT '发行总量',
   `current_no` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前已售编号',
   `price` DECIMAL(10,2) NOT NULL COMMENT '单价（元）',
-
   `limit_per_user` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '每人限购数量',
   `description` TEXT DEFAULT NULL COMMENT '藏品描述（富文本）',
   `chain_hash` VARCHAR(66) DEFAULT NULL COMMENT '链上哈希',

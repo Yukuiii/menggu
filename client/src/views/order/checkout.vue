@@ -72,6 +72,8 @@ const handlePurchase = async () => {
   if (!canAfford.value || !agreedTerms.value) return
   buyState.value = 'paying'
   try {
+    // 先展示3秒支付中状态
+    await new Promise(resolve => setTimeout(resolve, 3000))
     const orderData = await apiCreateOrder({ collectionId: collection.value.id })
     orderId.value = orderData.orderId
     const payData = await apiPayOrder(orderData.orderId)
@@ -80,7 +82,7 @@ const handlePurchase = async () => {
       orderId: payData.orderNo || String(payData.orderId),
       tokenId: payData.tokenId,
       chainHash: payData.chainHash,
-      payTime: payData.paidAt
+      payTime: payData.paidAt ? new Date(payData.paidAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-'
     }
     buyState.value = 'success'
   } catch {
