@@ -115,12 +115,9 @@ exports.auditCollection = async (req, res, next) => {
       const chainHash = generateChainHash(`${collection.name}-${collection.id}`)
       const contractAddress = generateContractAddress()
       const blockHeight = getNextBlockHeight()
-
       const now = new Date()
-      const saleTime = new Date(collection.saleTime)
-      const newStatus = saleTime <= now ? 5 : 4
 
-      await collection.update({ status: newStatus, chainHash, contractAddress, blockHeight, chainTime: now })
+      await collection.update({ status: 5, chainHash, contractAddress, blockHeight, chainTime: now })
 
       const creatorUserId = collection.Series?.Creator?.userId
       if (creatorUserId) {
@@ -166,9 +163,7 @@ exports.toggleCollectionStatus = async (req, res, next) => {
       if (![2, 7].includes(collection.status)) {
         return fail(res, '仅已通过或已下架的藏品可上架')
       }
-      const now = new Date()
-      const newStatus = new Date(collection.saleTime) <= now ? 5 : 4
-      await collection.update({ status: newStatus })
+      await collection.update({ status: 5 })
       success(res, null, '已上架')
     } else if (action === 'offline') {
       // 下架：仅发售中/待发售的藏品可下架

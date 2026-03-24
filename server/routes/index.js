@@ -9,7 +9,6 @@ router.use('/admin', require('./admin'))
 router.use('/my-collections', require('./userCollection'))
 router.use('/wallet', require('./wallet'))
 router.use('/upload', require('./upload'))
-router.use('/subscriptions', require('./subscription'))
 router.use('/follows', require('./follow'))
 
 module.exports = router

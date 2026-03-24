@@ -107,20 +107,19 @@ CREATE TABLE `collections` (
   `total_supply` INT UNSIGNED NOT NULL COMMENT '发行总量',
   `current_no` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前已售编号',
   `price` DECIMAL(10,2) NOT NULL COMMENT '单价（元）',
-  `sale_time` DATETIME NOT NULL COMMENT '发售时间',
+
   `limit_per_user` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '每人限购数量',
   `description` TEXT DEFAULT NULL COMMENT '藏品描述（富文本）',
   `chain_hash` VARCHAR(66) DEFAULT NULL COMMENT '链上哈希',
   `contract_address` VARCHAR(42) DEFAULT NULL COMMENT '模拟合约地址（每个藏品一个）',
   `block_height` BIGINT UNSIGNED DEFAULT NULL COMMENT '区块高度',
   `chain_time` DATETIME DEFAULT NULL COMMENT '上链时间',
-  `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态 0草稿 1审核中 2已通过 3已拒绝 4待发售 5发售中 6已售罄 7已下架',
+  `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态 0草稿 1审核中 2已通过 3已拒绝 5发售中 6已售罄 7已下架',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_series_id` (`series_id`),
-  KEY `idx_status` (`status`),
-  KEY `idx_sale_time` (`sale_time`)
+  KEY `idx_status` (`status`)
 ) ENGINE=InnoDB COMMENT='藏品表';
 
 -- ----------------------------
@@ -235,19 +234,7 @@ CREATE TABLE `announcements` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB COMMENT='系统公告表';
 
--- ----------------------------
--- 藏品预约表
--- ----------------------------
-CREATE TABLE `subscriptions` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '预约ID',
-  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `collection_id` INT UNSIGNED NOT NULL COMMENT '藏品ID',
-  `notified` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否已发送提醒',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_user_collection` (`user_id`, `collection_id`),
-  KEY `idx_collection_id` (`collection_id`)
-) ENGINE=InnoDB COMMENT='藏品预约表';
+
 
 -- ----------------------------
 -- 关注关系表

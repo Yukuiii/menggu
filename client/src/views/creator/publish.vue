@@ -27,7 +27,7 @@ const form = ref({
   price: '',
   totalSupply: '',
   limitPerUser: '1',
-  saleTime: '',
+
   description: '',
   coverUrl: '',
   fileUrl: '',
@@ -82,7 +82,7 @@ const handleFileChange = async (e) => {
 
 /** 提交审核 */
 const handleSubmit = async () => {
-  if (!form.value.name || !form.value.price || !form.value.totalSupply || !form.value.seriesId || !form.value.saleTime) return
+  if (!form.value.name || !form.value.price || !form.value.totalSupply || !form.value.seriesId) return
   submitting.value = true
   try {
     await apiCreatorPublish({
@@ -94,7 +94,6 @@ const handleSubmit = async () => {
       price: form.value.price,
       totalSupply: form.value.totalSupply,
       limitPerUser: form.value.limitPerUser || 1,
-      saleTime: form.value.saleTime,
       description: form.value.description
     })
     submitting.value = false
@@ -270,12 +269,6 @@ onMounted(() => {
                 <label class="form-label">每人限购</label>
                 <input v-model.number="form.limitPerUser" type="number" class="form-input" placeholder="单人最多购买份数" min="1" required />
               </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">发售时间</label>
-              <input v-model="form.saleTime" type="datetime-local" class="form-input" required />
-              <p class="help-text">到达发售时间后，用户才可进行购买</p>
             </div>
           </div>
 

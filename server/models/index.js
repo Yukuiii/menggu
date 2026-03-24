@@ -28,7 +28,7 @@ const Notification = require('./Notification')(sequelize)
 const Banner = require('./Banner')(sequelize)
 const Announcement = require('./Announcement')(sequelize)
 const CreatorRevenue = require('./CreatorRevenue')(sequelize)
-const Subscription = require('./Subscription')(sequelize)
+
 const Follow = require('./Follow')(sequelize)
 
 // ========== 定义关联关系 ==========
@@ -78,9 +78,7 @@ CreatorRevenue.belongsTo(Creator, { foreignKey: 'creatorId' })
 CreatorRevenue.belongsTo(Order, { foreignKey: 'orderId' })
 CreatorRevenue.belongsTo(Collection, { foreignKey: 'collectionId' })
 
-// Subscription 关联
-Subscription.belongsTo(User, { foreignKey: 'userId' })
-Subscription.belongsTo(Collection, { foreignKey: 'collectionId' })
+
 
 // Follow 关联
 Follow.belongsTo(User, { foreignKey: 'userId' })
@@ -100,6 +98,5 @@ module.exports = {
   Banner,
   Announcement,
   CreatorRevenue,
-  Subscription,
   Follow
 }

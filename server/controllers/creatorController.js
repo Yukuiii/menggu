@@ -112,9 +112,9 @@ exports.publish = async (req, res, next) => {
       return fail(res, '仅认证创作者可发布藏品')
     }
 
-    const { seriesId, name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, saleTime, description } = req.body
+    const { seriesId, name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, description } = req.body
 
-    if (!name || !cover || !seriesId || !price || !totalSupply || !saleTime) {
+    if (!name || !cover || !seriesId || !price || !totalSupply) {
       return fail(res, '请填写完整藏品信息')
     }
 
@@ -127,7 +127,7 @@ exports.publish = async (req, res, next) => {
     const collection = await Collection.create({
       name, cover, fileUrl, fileType: fileType || 'image',
       seriesId, totalSupply, price, limitPerUser: limitPerUser || 1,
-      saleTime, description, status: 1 // 审核中
+      description, status: 1 // 审核中
     })
 
     await creator.increment('worksCount')

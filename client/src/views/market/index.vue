@@ -33,7 +33,6 @@ const categories = [
 // 状态选项
 const statuses = [
   { key: 'all', label: '全部状态' },
-  { key: 'upcoming', label: '即将发售' },
   { key: 'selling', label: '发售中' },
   { key: 'soldout', label: '已售罄' }
 ]
@@ -57,12 +56,11 @@ const fetchCollections = async () => {
       name: item.name,
       cover: item.cover,
       category: item.fileType,
-      status: item.status === 4 ? 'upcoming' : item.status === 5 ? 'selling' : 'soldout',
+      status: item.status === 5 ? 'selling' : 'soldout',
       price: Number(item.price || 0),
       totalSupply: Number(item.totalSupply || 0),
       currentNo: Number(item.currentNo || 0),
       creator: item.Series?.Creator?.name || '未知创作者',
-      saleTime: item.saleTime,
       seriesName: item.Series?.name || '-'
     }))
   } finally {
@@ -95,7 +93,6 @@ const filteredCollections = computed(() => {
 /** 获取状态标签样式 */
 const getStatusInfo = (status) => {
   const map = {
-    upcoming: { label: '即将发售', class: 'status-upcoming', icon: Clock },
     selling: { label: '发售中', class: 'status-selling', icon: Flame },
     soldout: { label: '已售罄', class: 'status-soldout', icon: CheckCircle }
   }
@@ -246,10 +243,7 @@ const getCategoryColor = (category) => {
                 </div>
                 <span class="progress-text">{{ item.currentNo }}/{{ item.totalSupply }}</span>
               </div>
-              <div v-else class="card-countdown">
-                <Clock :size="13" />
-                <span>{{ new Date(item.saleTime).toLocaleDateString('zh-CN') }} 开售</span>
-              </div>
+
 
               <!-- 底部：价格 + 按钮 -->
               <div class="card-footer">
@@ -261,7 +255,7 @@ const getCategoryColor = (category) => {
                   :class="['card-btn', { 'btn-disabled': item.status === 'soldout' }]"
                   :disabled="item.status === 'soldout'"
                 >
-                  {{ item.status === 'soldout' ? '已售罄' : item.status === 'upcoming' ? '预约' : '立即购买' }}
+                  {{ item.status === 'soldout' ? '已售罄' : '立即购买' }}
                   <ArrowRight v-if="item.status !== 'soldout'" :size="14" />
                 </button>
               </div>

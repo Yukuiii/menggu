@@ -12,13 +12,13 @@ module.exports = (sequelize) => {
     totalSupply: { type: DataTypes.INTEGER, comment: '发行总量' },
     currentNo: { type: DataTypes.INTEGER, defaultValue: 0, comment: '当前已售编号' },
     price: { type: DataTypes.DECIMAL(10, 2), comment: '单价(元)' },
-    saleTime: { type: DataTypes.DATE, comment: '发售时间' },
+
     limitPerUser: { type: DataTypes.INTEGER, defaultValue: 1, comment: '每人限购数量' },
     description: { type: DataTypes.TEXT, comment: '藏品描述' },
     chainHash: { type: DataTypes.STRING(66), comment: '链上哈希' },
     contractAddress: { type: DataTypes.STRING(42), comment: '合约地址' },
     blockHeight: { type: DataTypes.BIGINT, comment: '区块高度' },
     chainTime: { type: DataTypes.DATE, comment: '上链时间' },
-    status: { type: DataTypes.TINYINT, defaultValue: 0, comment: '状态 0草稿 1审核中 2已通过 3已拒绝 4待发售 5发售中 6已售罄 7已下架' }
+    status: { type: DataTypes.TINYINT, defaultValue: 0, comment: '状态 0草稿 1审核中 2已通过 3已拒绝 5发售中 6已售罄 7已下架' }
   }, { tableName: 'collections', timestamps: true })
 }

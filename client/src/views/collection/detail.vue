@@ -44,7 +44,7 @@ const collection = ref({
     totalSales: 0
   },
   seriesName: '',
-  saleTime: '',
+
   chain: {
     hash: '',
     contractAddress: '',
@@ -62,7 +62,7 @@ const fetchCollectionDetail = async () => {
     name: data.name,
     cover: data.cover,
     category: data.fileType,
-    status: data.status === 4 ? 'upcoming' : data.status === 5 ? 'selling' : 'soldout',
+    status: data.status === 5 ? 'selling' : 'soldout',
     price: Number(data.price || 0),
     totalSupply: Number(data.totalSupply || 0),
     currentNo: Number(data.currentNo || 0),
@@ -76,7 +76,7 @@ const fetchCollectionDetail = async () => {
       totalSales: data.Series?.Creator?.totalSales || 0
     },
     seriesName: data.Series?.name || '-',
-    saleTime: data.saleTime,
+
     chain: {
       hash: data.chainHash || '-',
       contractAddress: data.contractAddress || '-',
@@ -97,7 +97,6 @@ const fetchCollectionDetail = async () => {
 /** 获取状态信息 */
 const statusInfo = computed(() => {
   const map = {
-    upcoming: { label: '即将发售', class: 'status-upcoming', icon: Clock },
     selling: { label: '发售中', class: 'status-selling', icon: Flame },
     soldout: { label: '已售罄', class: 'status-soldout', icon: CheckCircle }
   }
@@ -262,10 +261,6 @@ const getTransferInfo = (type) => {
                 <template v-if="collection.status === 'soldout'">
                   <CheckCircle :size="18" />
                   已售罄
-                </template>
-                <template v-else-if="collection.status === 'upcoming'">
-                  <Clock :size="18" />
-                  预约提醒
                 </template>
                 <template v-else>
                   <ShoppingCart :size="18" />
