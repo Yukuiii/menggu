@@ -15,9 +15,6 @@ router.get('/collections', auth, adminController.collectionList)
 router.post('/collections/:id/audit', auth, adminController.auditCollection)
 router.post('/collections/:id/toggle-status', auth, adminController.toggleCollectionStatus)
 
-// 系列管理
-router.get('/series', auth, adminController.seriesList)
-
 // 订单管理
 router.get('/orders', auth, adminController.orderList)
 router.post('/orders/:id/refund', auth, adminController.refundOrder)

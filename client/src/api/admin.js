@@ -25,11 +25,6 @@ export function apiAdminCreatorList(params) {
   return request.get('/admin/creators', { params })
 }
 
-/** 系列列表（用于发布页系列选择） */
-export function apiAdminSeriesList(params) {
-  return request.get('/admin/series', { params })
-}
-
 /** 审核藏品 */
 export function apiAdminAuditCollection(id, data) {
   return request.post(`/admin/collections/${id}/audit`, data)

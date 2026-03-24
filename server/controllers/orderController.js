@@ -1,4 +1,4 @@
-const { Order, Collection, Series, Creator, User, UserCollection, TransferRecord, CreatorRevenue, Notification, sequelize } = require('../models')
+const { Order, Collection, Creator, User, UserCollection, TransferRecord, CreatorRevenue, Notification, sequelize } = require('../models')
 const { success, fail } = require('../utils/response')
 const { generateOrderNo } = require('../utils/order')
 const { generateChainHash, getNextBlockHeight } = require('../utils/chain')
@@ -90,7 +90,7 @@ exports.pay = async (req, res, next) => {
     // 4. 查藏品并加锁，再次校验库存
     const collection = await Collection.findByPk(order.collectionId, {
       lock: true, transaction: t,
-      include: [{ model: Series, include: [Creator] }]
+      include: [{ model: Creator }]
     })
     if (collection.currentNo >= collection.totalSupply) {
       await t.rollback()
@@ -145,7 +145,7 @@ exports.pay = async (req, res, next) => {
     }, { transaction: t })
 
     // 11. 计算创作者分成
-    const creator = collection.Series?.Creator
+    const creator = collection.Creator
     if (creator) {
       const rate = parseFloat(creator.commissionRate)
       const orderAmount = parseFloat(order.amount)
@@ -238,11 +238,7 @@ exports.detail = async (req, res, next) => {
         {
           model: Collection,
           attributes: ['id', 'name', 'cover', 'price', 'fileType', 'chainHash', 'contractAddress'],
-          include: [{
-            model: Series,
-            attributes: ['id', 'name'],
-            include: [{ model: Creator, attributes: ['id', 'name'] }]
-          }]
+          include: [{ model: Creator, attributes: ['id', 'name'] }]
         },
         { model: User, attributes: ['id', 'nickname', 'walletAddress'] }
       ]

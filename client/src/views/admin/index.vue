@@ -178,8 +178,7 @@ onMounted(() => {
               <div class="audit-info">
                 <div class="audit-name">{{ col.name }}</div>
                 <div class="audit-meta">
-                  <span>{{ col.Series?.name || '-' }}</span>
-                  <span>{{ col.Series?.Creator?.name || '-' }}</span>
+                  <span>{{ col.Creator?.name || '-' }}</span>
                   <span>¥{{ Number(col.price || 0).toFixed(2) }}</span>
                   <span>共{{ col.totalSupply }}份</span>
                 </div>

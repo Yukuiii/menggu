@@ -1,4 +1,4 @@
-const { User, Order, Collection, Creator, Series, Notification, UserCollection, Announcement, sequelize } = require('../models')
+const { User, Order, Collection, Creator, Notification, UserCollection, Announcement, sequelize } = require('../models')
 const { success, fail } = require('../utils/response')
 const { generateChainHash, generateContractAddress, getNextBlockHeight } = require('../utils/chain')
 const { Op } = require('sequelize')
@@ -105,7 +105,7 @@ exports.auditCollection = async (req, res, next) => {
   try {
     const { action, rejectReason } = req.body
     const collection = await Collection.findByPk(req.params.id, {
-      include: [{ model: Series, include: [{ model: Creator, include: [User] }] }]
+      include: [{ model: Creator, include: [User] }]
     })
 
     if (!collection) return fail(res, '藏品不存在')
@@ -119,7 +119,7 @@ exports.auditCollection = async (req, res, next) => {
 
       await collection.update({ status: 5, chainHash, contractAddress, blockHeight, chainTime: now })
 
-      const creatorUserId = collection.Series?.Creator?.userId
+      const creatorUserId = collection.Creator?.userId
       if (creatorUserId) {
         await Notification.create({
           userId: creatorUserId,
@@ -134,7 +134,7 @@ exports.auditCollection = async (req, res, next) => {
       if (!rejectReason) return fail(res, '请填写拒绝原因')
       await collection.update({ status: 3 })
 
-      const creatorUserId = collection.Series?.Creator?.userId
+      const creatorUserId = collection.Creator?.userId
       if (creatorUserId) {
         await Notification.create({
           userId: creatorUserId,
@@ -167,8 +167,8 @@ exports.toggleCollectionStatus = async (req, res, next) => {
       success(res, null, '已上架')
     } else if (action === 'offline') {
       // 下架：仅发售中/待发售的藏品可下架
-      if (![4, 5].includes(collection.status)) {
-        return fail(res, '仅待发售或发售中的藏品可下架')
+      if (![5].includes(collection.status)) {
+        return fail(res, '仅发售中的藏品可下架')
       }
       await collection.update({ status: 7 })
       success(res, null, '已下架')
@@ -194,32 +194,6 @@ exports.collectionList = async (req, res, next) => {
     const offset = (parseInt(page) - 1) * parseInt(limit)
     const { count, rows } = await Collection.findAndCountAll({
       where,
-      include: [{
-        model: Series,
-        attributes: ['id', 'name'],
-        include: [{ model: Creator, attributes: ['id', 'name'] }]
-      }],
-      order: [['createdAt', 'DESC']],
-      offset,
-      limit: parseInt(limit)
-    })
-
-    success(res, { list: rows, total: count, page: parseInt(page), limit: parseInt(limit) })
-  } catch (err) { next(err) }
-}
-
-/** 系列管理列表 */
-exports.seriesList = async (req, res, next) => {
-  try {
-    const { search, page = 1, limit = 20 } = req.query
-    const where = {}
-    if (search) {
-      where.name = { [Op.like]: `%${search}%` }
-    }
-
-    const offset = (parseInt(page) - 1) * parseInt(limit)
-    const { count, rows } = await Series.findAndCountAll({
-      where,
       include: [{ model: Creator, attributes: ['id', 'name'] }],
       order: [['createdAt', 'DESC']],
       offset,
@@ -229,6 +203,8 @@ exports.seriesList = async (req, res, next) => {
     success(res, { list: rows, total: count, page: parseInt(page), limit: parseInt(limit) })
   } catch (err) { next(err) }
 }
+
+
 
 /** 管理员订单列表（全平台，支持状态/时间筛选） */
 exports.orderList = async (req, res, next) => {

@@ -10,18 +10,16 @@ import {
   CheckCircle, AlertCircle, Loader2, Info, Hash, Clock
 } from 'lucide-vue-next'
 import { apiCreatorPublish } from '../../api/creator'
-import { apiAdminSeriesList } from '../../api/admin'
 import { apiUploadCover, apiUploadFile } from '../../api/upload'
 
 const router = useRouter()
 
-const seriesOptions = ref([])
+
 const coverInputRef = ref(null)
 const fileInputRef = ref(null)
 const uploading = ref({ cover: false, file: false })
 
 const form = ref({
-  seriesId: '',
   name: '',
   category: '',
   price: '',
@@ -82,11 +80,10 @@ const handleFileChange = async (e) => {
 
 /** 提交审核 */
 const handleSubmit = async () => {
-  if (!form.value.name || !form.value.price || !form.value.totalSupply || !form.value.seriesId) return
+  if (!form.value.name || !form.value.price || !form.value.totalSupply) return
   submitting.value = true
   try {
     await apiCreatorPublish({
-      seriesId: form.value.seriesId,
       name: form.value.name,
       cover: form.value.coverUrl,
       fileUrl: form.value.fileUrl,
@@ -103,14 +100,8 @@ const handleSubmit = async () => {
   }
 }
 
-const fetchSeriesOptions = async () => {
-  const data = await apiAdminSeriesList({ page: 1, limit: 100 })
-  seriesOptions.value = data.list || []
-}
 
-onMounted(() => {
-  fetchSeriesOptions()
-})
+onMounted(() => {})
 </script>
 
 <template>
@@ -217,26 +208,15 @@ onMounted(() => {
           <div class="form-section">
             <h3 class="section-title">基本信息</h3>
             
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">所属系列</label>
-                <select v-model="form.seriesId" class="form-input select" required>
-                  <option value="" disabled>请选择所属系列</option>
-                  <option v-for="s in seriesOptions" :key="s.id" :value="s.id">{{ s.name }}</option>
-                </select>
-                <p class="help-text">每个藏品必须从属于一个系列</p>
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">所属分类</label>
-                <select v-model="form.category" class="form-input select" required>
-                  <option value="" disabled>请选择所属分类</option>
-                  <option value="服饰图鉴">服饰图鉴</option>
-                  <option value="纹样艺术">纹样艺术</option>
-                  <option value="工艺实拍">工艺实拍</option>
-                  <option value="3D模型">3D模型</option>
-                </select>
-              </div>
+            <div class="form-group">
+              <label class="form-label">所属分类</label>
+              <select v-model="form.category" class="form-input select" required>
+                <option value="" disabled>请选择所属分类</option>
+                <option value="服饰图鉴">服饰图鉴</option>
+                <option value="纹样艺术">纹样艺术</option>
+                <option value="工艺实拍">工艺实拍</option>
+                <option value="3D模型">3D模型</option>
+              </select>
             </div>
 
             <div class="form-group">

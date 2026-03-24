@@ -98,7 +98,6 @@ const fetchCreatorData = async () => {
         cover: item.cover || '',
         status: item.status === 0 ? 'draft' : item.status === 1 ? 'pending' : item.status === 2 ? 'approved' : 'rejected',
         category: getFileTypeLabel(item.fileType),
-        seriesName: item.Series?.name || '-',
         price: Number(item.price || 0),
         totalSupply: Number(item.totalSupply || 0),
         sold: Number(item.currentNo || 0),
@@ -320,7 +319,6 @@ const getStatusInfo = (status) => {
                 </div>
                 <h3 class="work-name">{{ work.name }}</h3>
                 <div class="work-meta">
-                  <span>{{ work.seriesName }}</span>
                   <span>创建于 {{ work.createTime }}</span>
                 </div>
                 <div v-if="work.status === 'rejected' && work.rejectReason" class="work-reject">

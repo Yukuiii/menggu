@@ -1,6 +1,5 @@
-const { Creator, User, Series, Collection } = require('../models')
+const { Creator, User, Collection } = require('../models')
 const { success, fail } = require('../utils/response')
-const { Op } = require('sequelize')
 
 /** 申请入驻创作者 */
 exports.apply = async (req, res, next) => {
@@ -60,26 +59,14 @@ exports.stats = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-/** 获取创作者作品列表（支持状态筛选） */
+/** 获取创作者作品列表（直接查 creatorId） */
 exports.works = async (req, res, next) => {
   try {
     const creator = await Creator.findOne({ where: { userId: req.userId } })
     if (!creator) return fail(res, '您还不是创作者')
 
     const { status, page = 1, limit = 10 } = req.query
-    const where = {}
-
-    // 查询该创作者所有系列
-    const seriesIds = (await Series.findAll({
-      where: { creatorId: creator.id },
-      attributes: ['id']
-    })).map(s => s.id)
-
-    if (seriesIds.length === 0) {
-      return success(res, { list: [], total: 0, page: parseInt(page), limit: parseInt(limit) })
-    }
-
-    where.seriesId = { [Op.in]: seriesIds }
+    const where = { creatorId: creator.id }
 
     // 状态筛选
     if (status && status !== 'all') {
@@ -94,7 +81,6 @@ exports.works = async (req, res, next) => {
     const offset = (parseInt(page) - 1) * parseInt(limit)
     const { count, rows } = await Collection.findAndCountAll({
       where,
-      include: [{ model: Series, attributes: ['id', 'name'] }],
       order: [['createdAt', 'DESC']],
       offset,
       limit: parseInt(limit)
@@ -112,46 +98,20 @@ exports.publish = async (req, res, next) => {
       return fail(res, '仅认证创作者可发布藏品')
     }
 
-    const { seriesId, name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, description } = req.body
+    const { name, cover, fileUrl, fileType, price, totalSupply, limitPerUser, description } = req.body
 
-    if (!name || !cover || !seriesId || !price || !totalSupply) {
+    if (!name || !cover || !price || !totalSupply) {
       return fail(res, '请填写完整藏品信息')
-    }
-
-    // 校验系列归属
-    const series = await Series.findByPk(seriesId)
-    if (!series || series.creatorId !== creator.id) {
-      return fail(res, '系列不存在或无权操作')
     }
 
     const collection = await Collection.create({
       name, cover, fileUrl, fileType: fileType || 'image',
-      seriesId, totalSupply, price, limitPerUser: limitPerUser || 1,
+      creatorId: creator.id, totalSupply, price, limitPerUser: limitPerUser || 1,
       description, status: 1 // 审核中
     })
 
     await creator.increment('worksCount')
 
     success(res, { collectionId: collection.id, status: 'pending' }, '藏品已提交审核')
-  } catch (err) { next(err) }
-}
-
-/** 创建藏品系列 */
-exports.createSeries = async (req, res, next) => {
-  try {
-    const creator = await Creator.findOne({ where: { userId: req.userId } })
-    if (!creator || creator.status !== 1) {
-      return fail(res, '仅认证创作者可创建系列')
-    }
-
-    const { name, cover, description } = req.body
-    if (!name) return fail(res, '请填写系列名称')
-
-    const series = await Series.create({
-      creatorId: creator.id,
-      name, cover, description
-    })
-
-    success(res, series, '系列创建成功')
   } catch (err) { next(err) }
 }

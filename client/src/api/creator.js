@@ -25,7 +25,3 @@ export function apiCreatorPublish(data) {
   return request.post('/creator/publish', data)
 }
 
-/** 创建藏品系列 */
-export function apiCreateSeries(data) {
-  return request.post('/creator/series', data)
-}

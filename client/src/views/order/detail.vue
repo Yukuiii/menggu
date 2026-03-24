@@ -25,7 +25,7 @@ const order = ref({
     id: '',
     name: '',
     cover: '',
-    seriesName: '',
+
     creator: '',
     tokenId: null
   },
@@ -55,8 +55,7 @@ const fetchOrder = async () => {
       id: data.Collection?.id,
       name: data.Collection?.name || '-',
       cover: data.Collection?.cover || '',
-      seriesName: data.Collection?.Series?.name || '-',
-      creator: data.Collection?.Series?.Creator?.name || '未知创作者',
+      creator: data.Collection?.Creator?.name || '未知创作者',
       tokenId: data.tokenId
     },
     price: Number(data.amount || 0),
@@ -118,7 +117,7 @@ const copyText = async (text, label) => {
           <div class="collection-box" @click="router.push(`/collection/${order.collection.id}`)">
             <img :src="order.collection.cover" :alt="order.collection.name" class="col-cover" />
             <div class="col-info">
-              <span class="col-series">{{ order.collection.seriesName }}</span>
+              <span class="col-series">{{ order.collection.creator }}</span>
               <h3 class="col-name">{{ order.collection.name }}</h3>
               <div class="col-meta">
                 <span>{{ order.collection.creator }}</span>

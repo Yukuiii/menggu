@@ -22,8 +22,7 @@ const fetchMyCollections = async () => {
     id: row.id,
     name: row.Collection?.name || '-',
     cover: row.Collection?.cover || '',
-    seriesName: row.Collection?.Series?.name || '-',
-    creator: row.Collection?.Series?.Creator?.name || '未知创作者',
+    creator: row.Collection?.Creator?.name || '未知创作者',
     tokenId: row.tokenId,
     purchaseTime: row.acquireTime,
     price: Number(row.Collection?.price || 0),
@@ -93,7 +92,7 @@ const totalValue = computed(() =>
               <div class="card-token">#{{ item.tokenId }}</div>
             </div>
             <div class="card-body">
-              <div class="card-series">{{ item.seriesName }}</div>
+              <div class="card-series">{{ item.creator }}</div>
               <h3 class="card-name">{{ item.name }}</h3>
               <p class="card-creator">{{ item.creator }}</p>
               <div class="card-footer">
@@ -109,7 +108,7 @@ const totalValue = computed(() =>
           <div v-for="item in filtered" :key="item.id" class="list-item" @click="router.push(`/my-collection/${item.id}`)">
             <img :src="item.cover" :alt="item.name" class="list-img" />
             <div class="list-info">
-              <div class="list-series">{{ item.seriesName }}</div>
+              <div class="list-series">{{ item.creator }}</div>
               <h3 class="list-name">{{ item.name }}</h3>
               <p class="list-creator">{{ item.creator }}</p>
             </div>

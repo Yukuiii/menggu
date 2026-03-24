@@ -43,7 +43,7 @@ const collection = ref({
     totalWorks: 0,
     totalSales: 0
   },
-  seriesName: '',
+
 
   chain: {
     hash: '',
@@ -68,14 +68,13 @@ const fetchCollectionDetail = async () => {
     currentNo: Number(data.currentNo || 0),
     description: data.description || '',
     creator: {
-      id: data.Series?.Creator?.id || null,
-      name: data.Series?.Creator?.name || '未知创作者',
-      avatar: data.Series?.Creator?.avatar || '',
-      bio: data.Series?.Creator?.intro || '',
-      totalWorks: data.Series?.Creator?.worksCount || 0,
-      totalSales: data.Series?.Creator?.totalSales || 0
+      id: data.Creator?.id || null,
+      name: data.Creator?.name || '未知创作者',
+      avatar: data.Creator?.avatar || '',
+      bio: data.Creator?.intro || '',
+      totalWorks: data.Creator?.worksCount || 0,
+      totalSales: data.Creator?.totalSales || 0
     },
-    seriesName: data.Series?.name || '-',
 
     chain: {
       hash: data.chainHash || '-',
@@ -211,7 +210,7 @@ const getTransferInfo = (type) => {
           <!-- 右侧信息 -->
           <div class="detail-info">
             <!-- 系列标签 -->
-            <div class="info-series">{{ collection.seriesName }}</div>
+            <div class="info-series">{{ collection.creator.name }}</div>
             <h1 class="info-title">{{ collection.name }}</h1>
 
             <!-- 创作者 -->

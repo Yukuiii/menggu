@@ -27,7 +27,7 @@ const userCol = ref({
     id: '',
     name: '',
     cover: '',
-    seriesName: '',
+
     creator: '',
     description: '',
     contractAddress: '',
@@ -53,8 +53,7 @@ const fetchMyCollectionDetail = async () => {
       id: data.Collection?.id,
       name: data.Collection?.name || '',
       cover: data.Collection?.cover || '',
-      seriesName: data.Collection?.Series?.name || '',
-      creator: data.Collection?.Series?.Creator?.name || '未知创作者',
+      creator: data.Collection?.Creator?.name || '未知创作者',
       description: data.Collection?.description || '',
       contractAddress: data.Collection?.contractAddress || '',
       blockHeight: data.Collection?.blockHeight || '',
@@ -127,7 +126,7 @@ onMounted(() => {
         </div>
         
         <div class="hero-right">
-          <p class="h-series">{{ userCol.collection.seriesName }}</p>
+          <p class="h-series">{{ userCol.collection.creator }}</p>
           <h1 class="h-title">{{ userCol.collection.name }}</h1>
           <p class="h-creator">由 <strong>{{ userCol.collection.creator }}</strong> 发行</p>
           

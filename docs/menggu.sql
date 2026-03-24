@@ -2,7 +2,8 @@
 -- 蒙古服饰非遗数字藏品平台 - 数据库初始化脚本
 -- ============================================
 
-CREATE DATABASE IF NOT EXISTS `menggu` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE IF EXISTS `menggu`;
+CREATE DATABASE `menggu` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `menggu`;
 
 -- ----------------------------
@@ -79,20 +80,6 @@ CREATE TABLE `creator_revenues` (
   KEY `idx_order_id` (`order_id`)
 ) ENGINE=InnoDB COMMENT='创作者收益明细表';
 
--- ----------------------------
--- 藏品系列表
--- ----------------------------
-CREATE TABLE `series` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '系列ID',
-  `creator_id` INT UNSIGNED NOT NULL COMMENT '创作者ID',
-  `name` VARCHAR(100) NOT NULL COMMENT '系列名称',
-  `cover` VARCHAR(255) DEFAULT NULL COMMENT '封面图',
-  `description` TEXT DEFAULT NULL COMMENT '系列描述',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_creator_id` (`creator_id`)
-) ENGINE=InnoDB COMMENT='藏品系列表';
 
 -- ----------------------------
 -- 藏品表
@@ -103,7 +90,7 @@ CREATE TABLE `collections` (
   `cover` VARCHAR(255) NOT NULL COMMENT '封面图',
   `file_url` VARCHAR(255) DEFAULT NULL COMMENT '藏品原始文件URL',
   `file_type` ENUM('image','audio','video','3d') NOT NULL DEFAULT 'image' COMMENT '文件类型',
-  `series_id` INT UNSIGNED NOT NULL COMMENT '所属系列ID',
+  `creator_id` INT UNSIGNED NOT NULL COMMENT '所属创作者ID',
   `total_supply` INT UNSIGNED NOT NULL COMMENT '发行总量',
   `current_no` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '当前已售编号',
   `price` DECIMAL(10,2) NOT NULL COMMENT '单价（元）',
@@ -118,7 +105,7 @@ CREATE TABLE `collections` (
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_series_id` (`series_id`),
+  KEY `idx_creator_id` (`creator_id`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB COMMENT='藏品表';
 
@@ -254,3 +241,9 @@ CREATE TABLE `follows` (
 -- ----------------------------
 INSERT INTO `users` (`email`, `password`, `nickname`, `wallet_address`, `balance`, `is_verified`, `role`, `status`)
 VALUES ('admin@qq.com', '$2b$10$AbZGZhCbkw9tuwlFwU.YNeIJFCYH2AphWe41oGtLFvLgaWghyaMHi', '管理员', '0xADMIN0000000000000000000000000000000000', 0.00, 1, 'admin', 1);
+
+-- ----------------------------
+-- 初始化普通用户（密码: 123456）
+-- ----------------------------
+INSERT INTO `users` (`email`, `password`, `nickname`, `wallet_address`, `balance`, `is_verified`, `role`, `status`)
+VALUES ('user@qq.com', '$2b$10$AbZGZhCbkw9tuwlFwU.YNeIJFCYH2AphWe41oGtLFvLgaWghyaMHi', '测试用户', '0xUSER00000000000000000000000000000000001', 10000.00, 1, 'user', 1);

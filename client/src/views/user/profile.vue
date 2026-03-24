@@ -22,6 +22,7 @@ const user = ref({
   email: '',
   phone: '',
   walletAddress: '',
+  balance: 0,
   isVerified: false,
   realName: '',
   idCard: '',
@@ -74,6 +75,7 @@ const fetchProfile = async () => {
     email: profile.email || '',
     phone: profile.phone || '',
     walletAddress: wallet.address || profile.walletAddress || '',
+    balance: parseFloat(wallet.balance || profile.balance || 0),
     isVerified: !!profile.isVerified,
     realName: profile.realName || '',
     idCard: profile.idCard || '',
@@ -116,8 +118,8 @@ onMounted(() => {
             </div>
             <div class="stat-item">
               <Wallet :size="20" />
-              <span class="stat-value">¥{{ user.stats.totalSpent }}</span>
-              <span class="stat-label">累计消费</span>
+              <span class="stat-value">¥{{ user.balance.toFixed(2) }}</span>
+              <span class="stat-label">钱包余额</span>
             </div>
           </div>
         </div>
@@ -150,6 +152,10 @@ onMounted(() => {
                     <Copy v-if="copied !== 'wallet'" :size="13" />
                     <CheckCircle v-else :size="13" class="copied" />
                   </button>
+                </div>
+                <div class="info-row">
+                  <span class="info-label"><Wallet :size="14" /> 余额</span>
+                  <span class="info-value balance-value">¥{{ user.balance.toFixed(2) }}</span>
                 </div>
               </div>
             </section>
@@ -282,6 +288,7 @@ onMounted(() => {
 .copy-btn { border: none; background: var(--bg-soft); border-radius: 6px; padding: 6px; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; flex-shrink: 0; }
 .copy-btn:hover { color: var(--accent); background: var(--accent-bg); }
 .copied { color: #20C997; }
+.balance-value { color: var(--accent) !important; font-size: 16px !important; font-weight: 800 !important; }
 
 .btn-logout { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #fcc; background: #fff5f5; color: #e03131; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
 .btn-logout:hover { background: #fee; border-color: #e03131; }

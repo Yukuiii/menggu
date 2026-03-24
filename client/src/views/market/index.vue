@@ -60,8 +60,7 @@ const fetchCollections = async () => {
       price: Number(item.price || 0),
       totalSupply: Number(item.totalSupply || 0),
       currentNo: Number(item.currentNo || 0),
-      creator: item.Series?.Creator?.name || '未知创作者',
-      seriesName: item.Series?.name || '-'
+      creator: item.Creator?.name || '未知创作者'
     }))
   } finally {
     loading.value = false
@@ -222,7 +221,7 @@ const getCategoryColor = (category) => {
                 <span>{{ getStatusInfo(item.status).label }}</span>
               </div>
               <!-- 系列名 -->
-              <div class="card-series">{{ item.seriesName }}</div>
+              <div class="card-series">{{ item.creator }}</div>
             </div>
 
             <!-- 信息区 -->

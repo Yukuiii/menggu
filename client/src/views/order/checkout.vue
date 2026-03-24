@@ -23,7 +23,7 @@ const collection = ref({
   id: route.params.id,
   name: '',
   cover: '',
-  seriesName: '',
+
   creator: '',
   price: 0,
   totalSupply: 0,
@@ -55,8 +55,7 @@ const fetchCheckoutData = async () => {
     id: collectionData.id,
     name: collectionData.name,
     cover: collectionData.cover,
-    seriesName: collectionData.Series?.name || '-',
-    creator: collectionData.Series?.Creator?.name || '未知创作者',
+    creator: collectionData.Creator?.name || '未知创作者',
     price: Number(collectionData.price || 0),
     totalSupply: Number(collectionData.totalSupply || 0),
     currentNo: Number(collectionData.currentNo || 0),
@@ -113,7 +112,7 @@ onMounted(() => {
           <div class="item-card">
             <img :src="collection.cover" :alt="collection.name" class="item-img" />
             <div class="item-info">
-              <div class="item-series">{{ collection.seriesName }}</div>
+              <div class="item-series">{{ collection.creator }}</div>
               <h2 class="item-name">{{ collection.name }}</h2>
               <p class="item-creator">创作者：{{ collection.creator }}</p>
               <div class="item-token">

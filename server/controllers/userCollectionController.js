@@ -1,4 +1,4 @@
-const { UserCollection, Collection, Series, Creator, User, TransferRecord, Notification, sequelize } = require('../models')
+const { UserCollection, Collection, Creator, User, TransferRecord, Notification, sequelize } = require('../models')
 const { success, fail } = require('../utils/response')
 const { generateChainHash } = require('../utils/chain')
 const path = require('path')
@@ -12,11 +12,7 @@ exports.list = async (req, res, next) => {
     const includeCollection = {
       model: Collection,
       attributes: ['id', 'name', 'cover', 'price', 'fileType'],
-      include: [{
-        model: Series,
-        attributes: ['id', 'name'],
-        include: [{ model: Creator, attributes: ['id', 'name'] }]
-      }]
+      include: [{ model: Creator, attributes: ['id', 'name'] }]
     }
 
     // 关键词搜索（藏品名称）
@@ -45,11 +41,7 @@ exports.detail = async (req, res, next) => {
     const uc = await UserCollection.findByPk(req.params.id, {
       include: [{
         model: Collection,
-        include: [{
-          model: Series,
-          attributes: ['id', 'name'],
-          include: [{ model: Creator, attributes: ['id', 'name', 'avatar'] }]
-        }]
+        include: [{ model: Creator, attributes: ['id', 'name', 'avatar'] }]
       }]
     })
 

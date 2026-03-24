@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
 
 // 导入模型
 const User = require('./User')(sequelize)
-const Series = require('./Series')(sequelize)
+
 const Collection = require('./Collection')(sequelize)
 const Order = require('./Order')(sequelize)
 const Creator = require('./Creator')(sequelize)
@@ -37,13 +37,9 @@ const Follow = require('./Follow')(sequelize)
 Creator.belongsTo(User, { foreignKey: 'userId' })
 User.hasOne(Creator, { foreignKey: 'userId' })
 
-// Creator <-> Series 一对多
-Series.belongsTo(Creator, { foreignKey: 'creatorId' })
-Creator.hasMany(Series, { foreignKey: 'creatorId' })
-
-// Series <-> Collection 一对多
-Collection.belongsTo(Series, { foreignKey: 'seriesId' })
-Series.hasMany(Collection, { foreignKey: 'seriesId' })
+// Creator <-> Collection 一对多
+Collection.belongsTo(Creator, { foreignKey: 'creatorId' })
+Creator.hasMany(Collection, { foreignKey: 'creatorId' })
 
 // User <-> Order 一对多
 Order.belongsTo(User, { foreignKey: 'userId' })
@@ -87,7 +83,6 @@ Follow.belongsTo(Creator, { foreignKey: 'creatorId' })
 module.exports = {
   sequelize,
   User,
-  Series,
   Collection,
   Order,
   Creator,
