@@ -2,13 +2,13 @@
 /**
  * 订单列表页 - 展示用户全部订单，支持状态筛选
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Home, ChevronRight, ShoppingBag, Clock, CheckCircle,
   XCircle, ArrowRight, CreditCard, Calendar
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiOrderList } from '../../api/order'
 
 const router = useRouter()
 const activeTab = ref('all')
@@ -20,29 +20,30 @@ const tabs = [
   { key: 'cancelled', label: '已取消' }
 ]
 
-// 模拟订单数据
-const orders = ref([
-  {
-    id: 'ORD20260320001', status: 'paid', time: '2026-03-20 10:00:32', payTime: '2026-03-20 10:01:05',
-    collection: { id: 1, name: '蒙古长袍·苍穹蓝', cover: coverImg, tokenId: 327 },
-    price: 99.00, payMethod: '微信支付'
-  },
-  {
-    id: 'ORD20260319002', status: 'paid', time: '2026-03-19 14:22:10', payTime: '2026-03-19 14:22:48',
-    collection: { id: 5, name: '卷草纹·金丝绣', cover: coverImg, tokenId: 156 },
-    price: 79.00, payMethod: '支付宝'
-  },
-  {
-    id: 'ORD20260322003', status: 'pending', time: '2026-03-22 11:30:05', payTime: '',
-    collection: { id: 10, name: '蒙古头饰·珊瑚冠', cover: coverImg, tokenId: null },
-    price: 169.00, payMethod: ''
-  },
-  {
-    id: 'ORD20260315004', status: 'cancelled', time: '2026-03-15 09:10:22', payTime: '',
-    collection: { id: 7, name: '那达慕盛装·火红', cover: coverImg, tokenId: null },
-    price: 149.00, payMethod: ''
-  }
-])
+const orders = ref([])
+
+const fetchOrders = async () => {
+  const data = await apiOrderList({ page: 1, limit: 100 })
+  orders.value = (data.list || []).map((item) => ({
+    id: item.id,
+    orderNo: item.orderNo,
+    status: item.status === 0 ? 'pending' : item.status === 1 || item.status === 2 ? 'paid' : 'cancelled',
+    time: item.createdAt,
+    payTime: item.paidAt,
+    collection: {
+      id: item.Collection?.id,
+      name: item.Collection?.name || '-',
+      cover: item.Collection?.cover || '',
+      tokenId: item.tokenId
+    },
+    price: Number(item.amount || 0),
+    payMethod: item.status === 1 || item.status === 2 ? '钱包余额' : ''
+  }))
+}
+
+onMounted(() => {
+  fetchOrders()
+})
 
 /** 按状态筛选 */
 const filteredOrders = computed(() => {
@@ -87,7 +88,7 @@ const getStatusInfo = (status) => {
           <div v-for="order in filteredOrders" :key="order.id" class="order-card" @click="router.push(`/order/${order.id}`)">
             <!-- 订单头 -->
             <div class="order-head">
-              <span class="order-id">{{ order.id }}</span>
+              <span class="order-id">{{ order.orderNo }}</span>
               <div :class="['order-status', getStatusInfo(order.status).class]">
                 <component :is="getStatusInfo(order.status).icon" :size="13" />
                 {{ getStatusInfo(order.status).label }}
@@ -110,7 +111,7 @@ const getStatusInfo = (status) => {
             </div>
             <!-- 订单操作 -->
             <div class="order-foot">
-              <button v-if="order.status === 'pending'" class="btn-pay" @click.stop>立即支付</button>
+              <button v-if="order.status === 'pending'" class="btn-pay" @click.stop="router.push(`/checkout/${order.collection.id}`)">立即支付</button>
               <button class="btn-detail" @click.stop="router.push(`/order/${order.id}`)">
                 查看详情 <ArrowRight :size="13" />
               </button>

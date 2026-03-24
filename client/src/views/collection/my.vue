@@ -2,45 +2,38 @@
 /**
  * 我的藏品页 - 展示用户持有的全部数字藏品
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Home, ChevronRight, Gem, Grid3x3, List, Search, X,
   ArrowRight, Hash, Calendar, Gift, ExternalLink
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiMyCollectionList } from '../../api/userCollection'
 
 const router = useRouter()
 const searchQuery = ref('')
 const viewMode = ref('grid') // grid | list
 
-// 模拟已购藏品
-const myCollections = ref([
-  {
-    id: 1, name: '蒙古长袍·苍穹蓝', cover: coverImg,
-    seriesName: '草原华裳', creator: '额尔敦工作室',
-    tokenId: 327, purchaseTime: '2026-03-20 10:00:32',
-    price: 99.00, chainHash: '0xa3f7c8d92e4b1056f8c5e7d3a9b0c1d4'
-  },
-  {
-    id: 5, name: '卷草纹·金丝绣', cover: coverImg,
-    seriesName: '草原纹语', creator: '乌兰花刺绣坊',
-    tokenId: 156, purchaseTime: '2026-03-19 14:22:10',
-    price: 79.00, chainHash: '0xb4e8d9f03f5c2167a9d6f8e4bac1d2e5'
-  },
-  {
-    id: 9, name: '毡房制作全记录', cover: coverImg,
-    seriesName: '匠心传承', creator: '巴特尔大师',
-    tokenId: 201, purchaseTime: '2026-03-17 08:15:44',
-    price: 49.00, chainHash: '0xc5f9eaf14a6d3278bad7a9f5cbc2d3e6'
-  },
-  {
-    id: 10, name: '蒙古头饰·珊瑚冠', cover: coverImg,
-    seriesName: '头上风华', creator: '草原数字',
-    tokenId: 42, purchaseTime: '2026-03-22 11:30:05',
-    price: 169.00, chainHash: '0xd6a0fbb25b7e4389cbe8b0a6dcd3e4f7'
-  }
-])
+const myCollections = ref([])
+
+const fetchMyCollections = async () => {
+  const data = await apiMyCollectionList({ page: 1, limit: 100 })
+  myCollections.value = (data.list || []).map((row) => ({
+    id: row.id,
+    name: row.Collection?.name || '-',
+    cover: row.Collection?.cover || '',
+    seriesName: row.Collection?.Series?.name || '-',
+    creator: row.Collection?.Series?.Creator?.name || '未知创作者',
+    tokenId: row.tokenId,
+    purchaseTime: row.acquireTime,
+    price: Number(row.Collection?.price || 0),
+    chainHash: row.chainHash
+  }))
+}
+
+onMounted(() => {
+  fetchMyCollections()
+})
 
 /** 搜索过滤 */
 const filtered = computed(() => {

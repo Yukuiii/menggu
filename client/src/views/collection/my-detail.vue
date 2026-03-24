@@ -3,46 +3,75 @@
  * 我的藏品详情页
  * 仅用于展示用户已经拥有的藏品，包含下载、转赠及链上凭证等所有者功能
  */
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft, Download, Send, CheckCircle, Clock,
   Hash, Code, Layers, FileText, ArrowRight, Copy, ShieldCheck, User
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiMyCollectionDetail, apiTransfer, getDownloadUrl } from '../../api/userCollection'
 
 const route = useRoute()
 const router = useRouter()
 const copied = ref('')
 
-// 模拟持有的藏品信息（区别于普通藏品详情，这里重点是用户持有实例）
 const userCol = ref({
-  id: route.params.id || 'UC001',
-  tokenId: 327,
+  id: route.params.id || '',
+  tokenId: 0,
   acquireType: 'purchase',
-  acquireTime: '2026-03-20 10:01:05',
-  isTransferable: true,
+  acquireTime: '',
+  isTransferable: false,
   transferCooldownAt: null,
-  chainHash: '0xa3f7c8d92e4b1056f8c5e7d3a9b0c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8b9b0',
+  chainHash: '',
   collection: {
-    id: 1,
-    name: '蒙古长袍·苍穹蓝',
-    cover: coverImg,
-    seriesName: '草原华裳',
-    creator: '额尔敦工作室',
-    description: '采用珍贵非遗蒙古族传统刺绣工艺，苍穹蓝色调还原纯净的天空印象（持有者专属内容解锁）。',
-    contractAddress: '0x1A2B3C4D5E6F7G8H9I0J',
-    blockHeight: '18539201',
+    id: '',
+    name: '',
+    cover: '',
+    seriesName: '',
+    creator: '',
+    description: '',
+    contractAddress: '',
+    blockHeight: '',
     fileType: 'image',
-    fileUrl: coverImg // 模拟原文件
+    fileUrl: ''
   }
 })
 
-// 模拟流转记录
-const transfers = ref([
-  { id: 3, type: 'purchase', action: '购买', from: '额尔敦工作室', to: '我', time: '2026-03-20 10:01', hash: '0xa3f7...b9b0' },
-  { id: 2, type: 'mint', action: '铸造', from: '', to: '额尔敦工作室', time: '2026-03-18 15:30', hash: '0x11b3...a4f9' }
-])
+const transfers = ref([])
+
+const fetchMyCollectionDetail = async () => {
+  const data = await apiMyCollectionDetail(route.params.id)
+  userCol.value = {
+    id: data.id,
+    tokenId: data.tokenId,
+    acquireType: data.acquireType,
+    acquireTime: data.acquireTime,
+    isTransferable: data.isTransferable,
+    transferCooldownAt: data.transferCooldownAt,
+    chainHash: data.chainHash,
+    collection: {
+      id: data.Collection?.id,
+      name: data.Collection?.name || '',
+      cover: data.Collection?.cover || '',
+      seriesName: data.Collection?.Series?.name || '',
+      creator: data.Collection?.Series?.Creator?.name || '未知创作者',
+      description: data.Collection?.description || '',
+      contractAddress: data.Collection?.contractAddress || '',
+      blockHeight: data.Collection?.blockHeight || '',
+      fileType: data.Collection?.fileType || 'image',
+      fileUrl: data.Collection?.fileUrl || ''
+    }
+  }
+  transfers.value = (data.transfers || []).map((item) => ({
+    id: item.id,
+    type: item.type,
+    action: item.type === 'gift' ? '转赠' : (item.type === 'mint' ? '铸造' : '购买'),
+    from: item.fromUser?.nickname || '',
+    to: item.toUser?.nickname || '我',
+    time: item.createdAt,
+    hash: item.chainHash ? `${item.chainHash.slice(0, 10)}...${item.chainHash.slice(-8)}` : '-'
+  }))
+}
 
 /** 复制文本 */
 const copyText = async (text, label) => {
@@ -55,23 +84,24 @@ const copyText = async (text, label) => {
 
 /** 下载原文件 */
 const handleDownload = () => {
-  // 模拟下载
-  const link = document.createElement('a')
-  link.href = userCol.value.collection.fileUrl
-  link.download = `${userCol.value.collection.name}_#${userCol.value.tokenId}`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  window.open(getDownloadUrl(route.params.id), '_blank')
 }
 
 /** 转赠操作 */
-const handleGift = () => {
+const handleGift = async () => {
   if (!userCol.value.isTransferable) {
     alert('该藏品还在冷却期，暂不可转赠')
     return
   }
-  alert('弹出转赠弹窗逻辑，由输入对方手机号/钱包地址进行转赠')
+  const recipientAddress = window.prompt('请输入接收方钱包地址')
+  if (!recipientAddress) return
+  await apiTransfer(route.params.id, recipientAddress)
+  await fetchMyCollectionDetail()
 }
+
+onMounted(() => {
+  fetchMyCollectionDetail()
+})
 </script>
 
 <template>

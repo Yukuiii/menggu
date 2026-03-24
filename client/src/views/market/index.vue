@@ -9,7 +9,7 @@ import {
   Clock, ShoppingBag, CheckCircle, ArrowRight, ArrowLeft,
   Home, ChevronRight, Gem, Filter, X, Flame, Sparkles
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiCollectionList } from '../../api/collection'
 
 const router = useRouter()
 
@@ -19,14 +19,13 @@ const searchQuery = ref('')
 const activeCategory = ref('all')
 // 当前状态筛选
 const activeStatus = ref('all')
-// 移动端筛选面板开关
-const showFilter = ref(false)
+const loading = ref(false)
 
 // 分类选项
 const categories = [
   { key: 'all', label: '全部', icon: Gem },
   { key: 'image', label: '服饰图鉴', icon: Image },
-  { key: 'pattern', label: '纹样艺术', icon: Sparkles },
+  { key: 'audio', label: '音频', icon: Music },
   { key: 'video', label: '工艺视频', icon: Video },
   { key: '3d', label: '3D 模型', icon: Box }
 ]
@@ -39,81 +38,41 @@ const statuses = [
   { key: 'soldout', label: '已售罄' }
 ]
 
-// 模拟藏品数据
-const collections = ref([
-  {
-    id: 1, name: '蒙古长袍·苍穹蓝', cover: coverImg, category: 'image', status: 'selling',
-    price: 99.00, totalSupply: 500, currentNo: 327,
-    creator: '额尔敦工作室', saleTime: '2026-03-20T10:00:00',
-    seriesName: '草原华裳'
-  },
-  {
-    id: 2, name: '鹿纹银饰·月光', cover: coverImg, category: 'pattern', status: 'selling',
-    price: 59.00, totalSupply: 1000, currentNo: 812,
-    creator: '银月坊', saleTime: '2026-03-18T10:00:00',
-    seriesName: '草原纹语'
-  },
-  {
-    id: 3, name: '马头琴制作工艺', cover: coverImg, category: 'video', status: 'upcoming',
-    price: 39.00, totalSupply: 200, currentNo: 0,
-    creator: '巴特尔大师', saleTime: '2026-03-25T10:00:00',
-    seriesName: '匠心传承'
-  },
-  {
-    id: 4, name: '蒙古战袍·铁骑', cover: coverImg, category: 'image', status: 'soldout',
-    price: 199.00, totalSupply: 100, currentNo: 100,
-    creator: '额尔敦工作室', saleTime: '2026-03-10T10:00:00',
-    seriesName: '草原华裳'
-  },
-  {
-    id: 5, name: '卷草纹·金丝绣', cover: coverImg, category: 'pattern', status: 'selling',
-    price: 79.00, totalSupply: 300, currentNo: 156,
-    creator: '乌兰花刺绣坊', saleTime: '2026-03-19T10:00:00',
-    seriesName: '草原纹语'
-  },
-  {
-    id: 6, name: '蒙古靴·云纹踏雪', cover: coverImg, category: '3d', status: 'upcoming',
-    price: 129.00, totalSupply: 150, currentNo: 0,
-    creator: '草原数字', saleTime: '2026-03-28T10:00:00',
-    seriesName: '足下生花'
-  },
-  {
-    id: 7, name: '那达慕盛装·火红', cover: coverImg, category: 'image', status: 'selling',
-    price: 149.00, totalSupply: 200, currentNo: 88,
-    creator: '额尔敦工作室', saleTime: '2026-03-15T10:00:00',
-    seriesName: '草原华裳'
-  },
-  {
-    id: 8, name: '犄纹腰带·银鞍', cover: coverImg, category: 'pattern', status: 'soldout',
-    price: 69.00, totalSupply: 500, currentNo: 500,
-    creator: '银月坊', saleTime: '2026-03-08T10:00:00',
-    seriesName: '草原纹语'
-  },
-  {
-    id: 9, name: '毡房制作全记录', cover: coverImg, category: 'video', status: 'selling',
-    price: 49.00, totalSupply: 300, currentNo: 201,
-    creator: '巴特尔大师', saleTime: '2026-03-17T10:00:00',
-    seriesName: '匠心传承'
-  },
-  {
-    id: 10, name: '蒙古头饰·珊瑚冠', cover: coverImg, category: '3d', status: 'selling',
-    price: 169.00, totalSupply: 100, currentNo: 42,
-    creator: '草原数字', saleTime: '2026-03-22T10:00:00',
-    seriesName: '头上风华'
-  },
-  {
-    id: 11, name: '云纹刺绣·春意', cover: coverImg, category: 'pattern', status: 'upcoming',
-    price: 89.00, totalSupply: 400, currentNo: 0,
-    creator: '乌兰花刺绣坊', saleTime: '2026-03-30T10:00:00',
-    seriesName: '草原纹语'
-  },
-  {
-    id: 12, name: '蒙古新娘嫁衣', cover: coverImg, category: 'image', status: 'selling',
-    price: 299.00, totalSupply: 50, currentNo: 31,
-    creator: '额尔敦工作室', saleTime: '2026-03-21T10:00:00',
-    seriesName: '草原华裳'
+const collections = ref([])
+
+/** 拉取藏品列表 */
+const fetchCollections = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: 1,
+      limit: 100,
+      search: searchQuery.value || undefined,
+      category: activeCategory.value !== 'all' ? activeCategory.value : undefined,
+      status: activeStatus.value !== 'all' ? activeStatus.value : undefined
+    }
+    const data = await apiCollectionList(params)
+    collections.value = (data.list || []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      cover: item.cover,
+      category: item.fileType,
+      status: item.status === 4 ? 'upcoming' : item.status === 5 ? 'selling' : 'soldout',
+      price: Number(item.price || 0),
+      totalSupply: Number(item.totalSupply || 0),
+      currentNo: Number(item.currentNo || 0),
+      creator: item.Series?.Creator?.name || '未知创作者',
+      saleTime: item.saleTime,
+      seriesName: item.Series?.name || '-'
+    }))
+  } finally {
+    loading.value = false
   }
-])
+}
+
+onMounted(() => {
+  fetchCollections()
+})
 
 /** 根据筛选条件过滤藏品 */
 const filteredCollections = computed(() => {

@@ -2,14 +2,14 @@
 /**
  * 创作者工作台 - 管理藏品发布、审核状态、收益统计
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Home, ChevronRight, Palette, Plus, Clock, CheckCircle,
   XCircle, Eye, Edit3, TrendingUp, DollarSign, Package,
   ShoppingBag, BarChart3, Upload, Image, FileText
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiCreatorStats, apiCreatorWorks } from '../../api/creator'
 
 const router = useRouter()
 const activeTab = ref('all')
@@ -22,60 +22,55 @@ const tabs = [
   { key: 'rejected', label: '已拒绝' }
 ]
 
-// 模拟创作者数据
 const stats = ref({
-  totalWorks: 8,
-  totalSales: 1520,
-  totalRevenue: 45800,
-  avgPrice: 128.50
+  totalWorks: 0,
+  totalSales: 0,
+  totalRevenue: 0,
+  avgPrice: 0
 })
 
-// 模拟藏品列表
-const works = ref([
-  {
-    id: 1, name: '蒙古长袍·苍穹蓝', cover: coverImg,
-    status: 'approved', category: '服饰图鉴', seriesName: '草原华裳',
-    price: 99.00, totalSupply: 500, sold: 327,
-    createTime: '2026-03-18', approveTime: '2026-03-19'
-  },
-  {
-    id: 7, name: '那达慕盛装·火红', cover: coverImg,
-    status: 'approved', category: '服饰图鉴', seriesName: '草原华裳',
-    price: 149.00, totalSupply: 200, sold: 88,
-    createTime: '2026-03-12', approveTime: '2026-03-14'
-  },
-  {
-    id: 12, name: '蒙古新娘嫁衣', cover: coverImg,
-    status: 'approved', category: '服饰图鉴', seriesName: '草原华裳',
-    price: 299.00, totalSupply: 50, sold: 31,
-    createTime: '2026-03-19', approveTime: '2026-03-20'
-  },
-  {
-    id: 4, name: '蒙古战袍·铁骑', cover: coverImg,
-    status: 'approved', category: '服饰图鉴', seriesName: '草原华裳',
-    price: 199.00, totalSupply: 100, sold: 100,
-    createTime: '2026-03-05', approveTime: '2026-03-08'
-  },
-  {
-    id: 101, name: '蒙古马鞍·金鹰纹', cover: coverImg,
-    status: 'pending', category: '3D 模型', seriesName: '马上风华',
-    price: 159.00, totalSupply: 120, sold: 0,
-    createTime: '2026-03-22', approveTime: ''
-  },
-  {
-    id: 102, name: '云纹绣花枕', cover: coverImg,
-    status: 'draft', category: '纹样艺术', seriesName: '草原纹语',
-    price: 0, totalSupply: 0, sold: 0,
-    createTime: '2026-03-23', approveTime: ''
-  },
-  {
-    id: 103, name: '蒙古族婚礼记录', cover: coverImg,
-    status: 'rejected', category: '工艺视频', seriesName: '匠心传承',
-    price: 89.00, totalSupply: 200, sold: 0,
-    createTime: '2026-03-20', approveTime: '',
-    rejectReason: '视频画质不满足平台要求，建议使用 1080p 以上分辨率重新录制'
+const works = ref([])
+
+const getFileTypeLabel = (type) => {
+  if (type === 'image') return '服饰图鉴'
+  if (type === 'audio') return '音频'
+  if (type === 'video') return '工艺视频'
+  if (type === '3d') return '3D 模型'
+  return '-'
+}
+
+const fetchCreatorData = async () => {
+  const [statsData, worksData] = await Promise.all([
+    apiCreatorStats(),
+    apiCreatorWorks({ page: 1, limit: 100 })
+  ])
+  stats.value = {
+    totalWorks: Number(statsData.worksCount || 0),
+    totalSales: Number(statsData.totalSales || 0),
+    totalRevenue: Number(statsData.totalRevenue || 0),
+    avgPrice: Number(statsData.totalSales || 0) > 0
+      ? (Number(statsData.totalRevenue || 0) / Number(statsData.totalSales || 0)).toFixed(2)
+      : 0
   }
-])
+  works.value = (worksData.list || []).map((item) => ({
+    id: item.id,
+    name: item.name,
+    cover: item.cover || '',
+    status: item.status === 0 ? 'draft' : item.status === 1 ? 'pending' : item.status === 2 ? 'approved' : 'rejected',
+    category: getFileTypeLabel(item.fileType),
+    seriesName: item.Series?.name || '-',
+    price: Number(item.price || 0),
+    totalSupply: Number(item.totalSupply || 0),
+    sold: Number(item.currentNo || 0),
+    createTime: item.createdAt ? item.createdAt.slice(0, 10) : '',
+    approveTime: item.updatedAt ? item.updatedAt.slice(0, 10) : '',
+    rejectReason: item.rejectReason || ''
+  }))
+}
+
+onMounted(() => {
+  fetchCreatorData()
+})
 
 /** 按状态筛选 */
 const filteredWorks = computed(() => {

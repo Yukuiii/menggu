@@ -2,57 +2,97 @@
 /**
  * 藏品详情页 - 展示藏品完整信息、链上存证、流转记录、购买操作
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Home, ChevronRight, ArrowLeft, Gem, Clock, ShieldCheck,
   Hash, FileCode, Layers, Calendar, User, Award,
   ArrowRight, Share2, Heart, ExternalLink, Copy, CheckCircle,
-  Flame, ShoppingCart, Gift
+  Flame, ShoppingCart, Gift, UserPlus, UserCheck
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiFollow, apiUnfollow, apiCheckFollow } from '../../api/follow'
+import { apiCollectionDetail } from '../../api/collection'
+import { useUserStore } from '../../stores'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 // 复制成功提示
 const copied = ref('')
 
-// 模拟藏品详情数据（后续替换为 API 请求）
+// 关注状态
+const followed = ref(false)
+const followLoading = ref(false)
+
 const collection = ref({
   id: route.params.id,
-  name: '蒙古长袍·苍穹蓝',
-  cover: coverImg,
+  name: '',
+  cover: '',
   category: 'image',
   status: 'selling',
-  price: 99.00,
-  totalSupply: 500,
-  currentNo: 327,
+  price: 0,
+  totalSupply: 0,
+  currentNo: 0,
   description: '这件蒙古长袍以辽阔草原的天空为灵感，采用传统手工缝制工艺，选用上等天蓝色绸缎为主体面料。袍身绣有精美的蒙古族传统云纹与卷草纹，每一针每一线都凝聚着非遗匠人的心血与智慧。\n\n长袍腰间饰以银质腰带扣，搭配传统蒙古族纹样的刺绣腰封，展现出蒙古族服饰特有的英武与优雅。此数字藏品完整记录了这件长袍从设计、裁剪到成衣的全过程。',
   creator: {
-    name: '额尔敦工作室',
+    id: null,
+    name: '',
     avatar: '',
-    bio: '内蒙古自治区非物质文化遗产传承工作室，专注蒙古族传统服饰的数字化保护与传播。',
-    totalWorks: 28,
-    totalSales: 1520
+    bio: '',
+    totalWorks: 0,
+    totalSales: 0
   },
-  seriesName: '草原华裳',
-  saleTime: '2026-03-20T10:00:00',
-  // 模拟链上信息
+  seriesName: '',
+  saleTime: '',
   chain: {
-    hash: '0xa3f7c8d92e4b1056f8c5e7d3a9b0c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0',
-    contractAddress: '0x1a2B3c4D5e6F7890AbCdEf1234567890AaBbCcDd',
-    blockHeight: 18003427,
-    chainTime: '2026-03-20T10:00:32',
-    tokenId: 327
+    hash: '',
+    contractAddress: '',
+    blockHeight: 0,
+    chainTime: '',
+    tokenId: 0
   },
-  // 模拟流转记录
-  transfers: [
-    { type: 'mint', from: '平台铸造', to: '额尔敦工作室', time: '2026-03-18 14:30', hash: '0xa3f7c8d92e4b1056f8c5e7d3a9b0c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8b9b0' },
-    { type: 'list', from: '额尔敦工作室', to: '平台发售', time: '2026-03-20 10:00', hash: '0xb4e8d9f03f5c2167a9d6f8e4bac1d2e5f6a7b8c9d0e1f2a3b4c5d6e7f8c2d1' },
-    { type: 'buy', from: '平台', to: '用户 0x8f2d...3a1c', time: '2026-03-20 10:00:32', hash: '0xc5f9eaf14a6d3278bad7a9f5cbc2d3e6f7a8b9c0d1e2f3a4b5c6d7e8f9d3e2' }
-  ]
+  transfers: []
 })
+
+const fetchCollectionDetail = async () => {
+  const data = await apiCollectionDetail(route.params.id)
+  collection.value = {
+    id: data.id,
+    name: data.name,
+    cover: data.cover,
+    category: data.fileType,
+    status: data.status === 4 ? 'upcoming' : data.status === 5 ? 'selling' : 'soldout',
+    price: Number(data.price || 0),
+    totalSupply: Number(data.totalSupply || 0),
+    currentNo: Number(data.currentNo || 0),
+    description: data.description || '',
+    creator: {
+      id: data.Series?.Creator?.id || null,
+      name: data.Series?.Creator?.name || '未知创作者',
+      avatar: data.Series?.Creator?.avatar || '',
+      bio: data.Series?.Creator?.intro || '',
+      totalWorks: data.Series?.Creator?.worksCount || 0,
+      totalSales: data.Series?.Creator?.totalSales || 0
+    },
+    seriesName: data.Series?.name || '-',
+    saleTime: data.saleTime,
+    chain: {
+      hash: data.chainHash || '-',
+      contractAddress: data.contractAddress || '-',
+      blockHeight: data.blockHeight || 0,
+      chainTime: data.chainTime || '',
+      tokenId: data.currentNo || 0
+    },
+    transfers: (data.transfers || []).map((t) => ({
+      type: t.type,
+      from: t.fromUser?.nickname || '平台铸造',
+      to: t.toUser?.nickname || '-',
+      time: t.createdAt,
+      hash: t.chainHash || '-'
+    }))
+  }
+}
 
 /** 获取状态信息 */
 const statusInfo = computed(() => {
@@ -84,6 +124,40 @@ const copyText = async (text, label) => {
     setTimeout(() => { copied.value = '' }, 1500)
   } catch { /* 忽略 */ }
 }
+
+/** 查询关注状态 */
+const checkFollowStatus = async () => {
+  if (!userStore.token || !collection.value.creator?.id) return
+  try {
+    const data = await apiCheckFollow(collection.value.creator.id)
+    followed.value = data.followed
+  } catch { /* 未登录或其他异常忽略 */ }
+}
+
+/** 关注 / 取消关注 */
+const toggleFollow = async () => {
+  if (!userStore.token) {
+    router.push('/login')
+    return
+  }
+  if (followLoading.value) return
+  followLoading.value = true
+  try {
+    if (followed.value) {
+      await apiUnfollow(collection.value.creator.id)
+      followed.value = false
+    } else {
+      await apiFollow(collection.value.creator.id)
+      followed.value = true
+    }
+  } catch { /* 错误已由拦截器处理 */ }
+  followLoading.value = false
+}
+
+onMounted(() => {
+  fetchCollectionDetail()
+  checkFollowStatus()
+})
 
 /** 流转类型图标与文案 */
 const getTransferInfo = (type) => {
@@ -146,10 +220,19 @@ const getTransferInfo = (type) => {
               <div class="creator-avatar">
                 <User :size="18" />
               </div>
-              <div>
+              <div class="creator-text">
                 <div class="creator-name">{{ collection.creator.name }}</div>
                 <div class="creator-label">创作者</div>
               </div>
+              <button
+                :class="['btn-follow-sm', { 'btn-followed-sm': followed }]"
+                :disabled="followLoading"
+                @click="toggleFollow"
+              >
+                <UserCheck v-if="followed" :size="13" />
+                <UserPlus v-else :size="13" />
+                {{ followed ? '已关注' : '关注' }}
+              </button>
             </div>
 
             <!-- 价格区 -->
@@ -329,7 +412,18 @@ const getTransferInfo = (type) => {
                   <User :size="28" />
                 </div>
                 <div class="creator-card-info">
-                  <h3 class="creator-card-name">{{ collection.creator.name }}</h3>
+                  <div class="creator-card-header">
+                    <h3 class="creator-card-name">{{ collection.creator.name }}</h3>
+                    <button
+                      :class="['btn-follow', { 'btn-followed': followed }]"
+                      :disabled="followLoading"
+                      @click="toggleFollow"
+                    >
+                      <UserCheck v-if="followed" :size="14" />
+                      <UserPlus v-else :size="14" />
+                      {{ followed ? '已关注' : '关注' }}
+                    </button>
+                  </div>
                   <p class="creator-card-bio">{{ collection.creator.bio }}</p>
                   <div class="creator-card-stats">
                     <div class="creator-stat">
@@ -522,6 +616,7 @@ const getTransferInfo = (type) => {
   display: flex; align-items: center; justify-content: center;
   color: var(--accent);
 }
+.creator-text { flex: 1; }
 .creator-name { font-size: 14px; font-weight: 600; color: var(--text-h); }
 .creator-label { font-size: 12px; color: var(--text-light); }
 
@@ -692,6 +787,38 @@ const getTransferInfo = (type) => {
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
+/* 关注按钮（顶部小尺寸） */
+.btn-follow-sm {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 16px; border-radius: 8px; margin-left: auto;
+  background: var(--accent); color: #fff;
+  font-size: 12px; font-weight: 600; border: none;
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.btn-follow-sm:hover { background: var(--accent-dark); }
+.btn-followed-sm {
+  background: transparent; color: var(--text-light);
+  border: 1.5px solid var(--border);
+}
+.btn-followed-sm:hover { border-color: #e03131; color: #e03131; background: #fff5f5; }
+
+/* 关注按钮（底部卡片） */
+.btn-follow {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 22px; border-radius: 8px;
+  background: var(--accent); color: #fff;
+  font-size: 13px; font-weight: 600; border: none;
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
+  flex-shrink: 0;
+}
+.btn-follow:hover { background: var(--accent-dark); box-shadow: 0 4px 12px rgba(198,137,63,0.25); }
+.btn-followed {
+  background: transparent; color: var(--text-light);
+  border: 1.5px solid var(--border);
+}
+.btn-followed:hover { border-color: #e03131; color: #e03131; background: #fff5f5; }
+.btn-follow:disabled, .btn-follow-sm:disabled { opacity: 0.6; cursor: wait; }
+
 /* 创作者卡片 */
 .creator-card {
   display: flex; gap: 20px; align-items: flex-start;
@@ -703,7 +830,8 @@ const getTransferInfo = (type) => {
   color: var(--accent); flex-shrink: 0;
 }
 .creator-card-info { flex: 1; }
-.creator-card-name { font-size: 17px; font-weight: 700; color: var(--text-h); margin: 0 0 8px; }
+.creator-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.creator-card-name { font-size: 17px; font-weight: 700; color: var(--text-h); margin: 0; }
 .creator-card-bio { font-size: 14px; line-height: 1.7; color: var(--text); margin: 0 0 16px; }
 .creator-card-stats { display: flex; gap: 32px; }
 .creator-stat { display: flex; flex-direction: column; }

@@ -2,29 +2,32 @@
 /**
  * 个人中心页 - 用户信息展示、实名认证、账户管理
  */
-import { ref} from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '../../stores'
+import { apiGetProfile, apiVerify } from '../../api/user'
+import { apiWalletBalance } from '../../api/wallet'
 import {
   Home, ChevronRight, User, Mail, Phone, Wallet, Shield,
   Settings, LogOut, Gem, ShoppingBag, ArrowRight, Edit3,
-  CheckCircle, AlertCircle, Copy
+  CheckCircle, AlertCircle, Copy, Heart
 } from 'lucide-vue-next'
 
 const router = useRouter()
+const userStore = useUserStore()
 const copied = ref('')
 
-// 模拟用户数据
 const user = ref({
-  nickname: '草原牧歌',
-  email: 'user@example.com',
-  phone: '138****6789',
-  walletAddress: '0x8f2d4a6b7c9e0f1d2a3b4c5d6e7f8a9b0c1d3a1c',
+  nickname: '',
+  email: '',
+  phone: '',
+  walletAddress: '',
   isVerified: false,
   realName: '',
   idCard: '',
   avatar: '',
-  joinTime: '2026-03-15',
-  stats: { collections: 4, orders: 6, totalSpent: 396 }
+  joinTime: '',
+  stats: { collections: 0, orders: 0, totalSpent: 0 }
 })
 
 // 实名认证表单
@@ -36,13 +39,17 @@ const verifyLoading = ref(false)
 const handleVerify = async () => {
   if (!verifyForm.value.realName || !verifyForm.value.idCard) return
   verifyLoading.value = true
-  // TODO: 接入真实 API
-  setTimeout(() => {
+  try {
+    await apiVerify({
+      realName: verifyForm.value.realName,
+      idCard: verifyForm.value.idCard
+    })
     user.value.isVerified = true
     user.value.realName = verifyForm.value.realName
     showVerify.value = false
+  } finally {
     verifyLoading.value = false
-  }, 1500)
+  }
 }
 
 /** 复制钱包地址 */
@@ -52,8 +59,33 @@ const copyWallet = async () => {
 
 /** 退出登录 */
 const handleLogout = () => {
+  userStore.logout()
   router.push('/login')
 }
+
+const fetchProfile = async () => {
+  const [profile, wallet] = await Promise.all([
+    apiGetProfile(),
+    apiWalletBalance()
+  ])
+  user.value = {
+    ...user.value,
+    nickname: profile.nickname || '',
+    email: profile.email || '',
+    phone: profile.phone || '',
+    walletAddress: wallet.address || profile.walletAddress || '',
+    isVerified: !!profile.isVerified,
+    realName: profile.realName || '',
+    idCard: profile.idCard || '',
+    avatar: profile.avatar || '',
+    joinTime: profile.createdAt ? profile.createdAt.slice(0, 10) : '',
+    stats: { ...user.value.stats, totalSpent: 0 }
+  }
+}
+
+onMounted(() => {
+  fetchProfile()
+})
 </script>
 
 <template>
@@ -176,6 +208,9 @@ const handleLogout = () => {
                 </router-link>
                 <router-link to="/orders" class="quick-link">
                   <ShoppingBag :size="18" /><span>我的订单</span><ArrowRight :size="14" class="ql-arrow" />
+                </router-link>
+                <router-link to="/follows" class="quick-link">
+                  <Heart :size="18" /><span>我的关注</span><ArrowRight :size="14" class="ql-arrow" />
                 </router-link>
                 <router-link to="/market" class="quick-link">
                   <Gem :size="18" /><span>藏品市场</span><ArrowRight :size="14" class="ql-arrow" />

@@ -2,32 +2,36 @@
 /**
  * 订单详情页 - 重新设计版
  */
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft, CheckCircle, Clock, XCircle, ShoppingBag, 
   CreditCard, Hash, Copy, FileText, ChevronRight
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiOrderDetail, apiPayOrder } from '../../api/order'
 
 const route = useRoute()
 const router = useRouter()
 const copied = ref('')
 
-// 模拟订单详情
 const order = ref({
-  id: route.params.id || 'ORD20260320001',
-  status: 'paid',
-  createTime: '2026-03-20 10:00:32',
-  payTime: '2026-03-20 10:01:05',
-  payMethod: '钱包余额支付',
+  id: route.params.id,
+  orderNo: '',
+  status: 'pending',
+  createTime: '',
+  payTime: '',
+  payMethod: '',
   collection: {
-    id: 1, name: '蒙古长袍·苍穹蓝', cover: coverImg,
-    seriesName: '草原华裳', creator: '额尔敦工作室', tokenId: 327
+    id: '',
+    name: '',
+    cover: '',
+    seriesName: '',
+    creator: '',
+    tokenId: null
   },
-  price: 99.00,
-  chainHash: '0xa3f7c8d92e4b1056f8c5e7d3a9b0c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8b9b0',
-  buyer: { nickname: '草原牧歌', walletAddress: '0x8f2d4a6b7c9e0f1d2a3b4c5d6e7f8a9b0c1d3a1c' }
+  price: 0,
+  chainHash: '',
+  buyer: { nickname: '', walletAddress: '' }
 })
 
 /** 状态配置 */
@@ -36,7 +40,42 @@ const statusMap = {
   paid: { label: '支付成功', desc: '交易已完成，藏品已发放至您的账户', class: 'st-paid', icon: CheckCircle },
   cancelled: { label: '已取消', desc: '订单已超时或主动取消', class: 'st-cancelled', icon: XCircle }
 }
-const statusInfo = statusMap[order.value.status] || statusMap.pending
+const statusInfo = computed(() => statusMap[order.value.status] || statusMap.pending)
+
+const fetchOrder = async () => {
+  const data = await apiOrderDetail(route.params.id)
+  order.value = {
+    id: data.id,
+    orderNo: data.orderNo,
+    status: data.status === 0 ? 'pending' : data.status === 1 || data.status === 2 ? 'paid' : 'cancelled',
+    createTime: data.createdAt,
+    payTime: data.paidAt,
+    payMethod: data.status === 1 || data.status === 2 ? '钱包余额支付' : '',
+    collection: {
+      id: data.Collection?.id,
+      name: data.Collection?.name || '-',
+      cover: data.Collection?.cover || '',
+      seriesName: data.Collection?.Series?.name || '-',
+      creator: data.Collection?.Series?.Creator?.name || '未知创作者',
+      tokenId: data.tokenId
+    },
+    price: Number(data.amount || 0),
+    chainHash: data.Collection?.chainHash || '',
+    buyer: {
+      nickname: data.User?.nickname || '',
+      walletAddress: data.User?.walletAddress || ''
+    }
+  }
+}
+
+const handlePay = async () => {
+  await apiPayOrder(route.params.id)
+  await fetchOrder()
+}
+
+onMounted(() => {
+  fetchOrder()
+})
 
 /** 复制文本 */
 const copyText = async (text, label) => {
@@ -64,7 +103,7 @@ const copyText = async (text, label) => {
           <h2 class="status-title">{{ statusInfo.label }}</h2>
           <p class="status-desc">{{ statusInfo.desc }}</p>
           <div class="status-amount">¥{{ order.price.toFixed(2) }}</div>
-          <button v-if="order.status === 'pending'" class="btn-pay">立即支付</button>
+          <button v-if="order.status === 'pending'" class="btn-pay" @click="handlePay">立即支付</button>
         </div>
 
         <div class="receipt-divider">
@@ -94,8 +133,8 @@ const copyText = async (text, label) => {
             <li class="detail-item">
               <span class="detail-label">订单编号</span>
               <span class="detail-value mono">
-                {{ order.id }}
-                <button class="icon-copy" @click="copyText(order.id, 'id')">
+                {{ order.orderNo }}
+                <button class="icon-copy" @click="copyText(order.orderNo, 'id')">
                   <CheckCircle v-if="copied === 'id'" :size="14" class="copied" />
                   <Copy v-else :size="14" />
                 </button>

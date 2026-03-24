@@ -2,13 +2,15 @@
 /**
  * 立即购买页 - 确认订单并使用钱包余额支付
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Home, ChevronRight, ShoppingCart, Wallet, ShieldCheck,
   CheckCircle, AlertCircle, Loader2, ArrowLeft, Hash, Lock
 } from 'lucide-vue-next'
-import coverImg from '../../assets/衣服1.jpeg'
+import { apiCollectionDetail } from '../../api/collection'
+import { apiCreateOrder, apiPayOrder } from '../../api/order'
+import { apiWalletBalance } from '../../api/wallet'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,23 +19,21 @@ const router = useRouter()
 const buyState = ref('confirm')
 const agreedTerms = ref(false)
 
-// 模拟藏品数据（后续从 API 获取）
 const collection = ref({
   id: route.params.id,
-  name: '蒙古长袍·苍穹蓝',
-  cover: coverImg,
-  seriesName: '草原华裳',
-  creator: '额尔敦工作室',
-  price: 99.00,
-  totalSupply: 500,
-  currentNo: 327,
-  tokenId: 328 // 即将获得的编号
+  name: '',
+  cover: '',
+  seriesName: '',
+  creator: '',
+  price: 0,
+  totalSupply: 0,
+  currentNo: 0,
+  tokenId: null
 })
 
-// 模拟钱包信息
 const wallet = ref({
-  address: '0x8f2d4a6b7c9e0f1d2a3b4c5d6e7f8a9b0c1d3a1c',
-  balance: 500.00
+  address: '',
+  balance: 0
 })
 
 /** 余额是否充足 */
@@ -44,26 +44,54 @@ const remainBalance = computed(() => (wallet.value.balance - collection.value.pr
 
 // 支付成功后的订单信息
 const orderResult = ref(null)
+const orderId = ref(null)
+
+const fetchCheckoutData = async () => {
+  const [collectionData, walletData] = await Promise.all([
+    apiCollectionDetail(route.params.id),
+    apiWalletBalance()
+  ])
+  collection.value = {
+    id: collectionData.id,
+    name: collectionData.name,
+    cover: collectionData.cover,
+    seriesName: collectionData.Series?.name || '-',
+    creator: collectionData.Series?.Creator?.name || '未知创作者',
+    price: Number(collectionData.price || 0),
+    totalSupply: Number(collectionData.totalSupply || 0),
+    currentNo: Number(collectionData.currentNo || 0),
+    tokenId: Number(collectionData.currentNo || 0) + 1
+  }
+  wallet.value = {
+    address: walletData.address || '',
+    balance: Number(walletData.balance || 0)
+  }
+}
 
 /** 确认购买 */
 const handlePurchase = async () => {
   if (!canAfford.value || !agreedTerms.value) return
   buyState.value = 'paying'
-
-  // 模拟支付过程
-  setTimeout(() => {
-    // 扣减余额
+  try {
+    const orderData = await apiCreateOrder({ collectionId: collection.value.id })
+    orderId.value = orderData.orderId
+    const payData = await apiPayOrder(orderData.orderId)
     wallet.value.balance -= collection.value.price
-    // 模拟生成订单
     orderResult.value = {
-      orderId: 'ORD' + Date.now(),
-      tokenId: collection.value.tokenId,
-      chainHash: '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-      payTime: new Date().toLocaleString('zh-CN')
+      orderId: payData.orderNo || String(payData.orderId),
+      tokenId: payData.tokenId,
+      chainHash: payData.chainHash,
+      payTime: payData.paidAt
     }
     buyState.value = 'success'
-  }, 2000)
+  } catch {
+    buyState.value = 'confirm'
+  }
 }
+
+onMounted(() => {
+  fetchCheckoutData()
+})
 </script>
 
 <template>

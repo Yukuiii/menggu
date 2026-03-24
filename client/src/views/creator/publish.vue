@@ -2,22 +2,18 @@
 /**
  * 发布新藏品页
  */
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   ArrowLeft, Upload, Image as ImageIcon,
   CheckCircle, AlertCircle, Loader2, Info, Hash, Clock
 } from 'lucide-vue-next'
+import { apiCreatorPublish } from '../../api/creator'
+import { apiAdminSeriesList } from '../../api/admin'
 
 const router = useRouter()
 
-// 模拟系列列表
-const seriesOptions = [
-  { id: 1, name: '草原华裳' },
-  { id: 2, name: '马上风华' },
-  { id: 3, name: '草原纹语' },
-  { id: 4, name: '匠心传承' }
-]
+const seriesOptions = ref([])
 
 const form = ref({
   seriesId: '',
@@ -50,15 +46,36 @@ const triggerUpload = (type) => {
 
 /** 提交审核 */
 const handleSubmit = async () => {
-  if (!form.value.name || !form.value.price || !form.value.totalSupply) return
+  if (!form.value.name || !form.value.price || !form.value.totalSupply || !form.value.seriesId || !form.value.saleTime) return
   submitting.value = true
-  
-  // 模拟请求
-  setTimeout(() => {
+  try {
+    await apiCreatorPublish({
+      seriesId: form.value.seriesId,
+      name: form.value.name,
+      cover: form.value.coverUrl,
+      fileUrl: form.value.fileUrl,
+      fileType: form.value.fileType,
+      price: form.value.price,
+      totalSupply: form.value.totalSupply,
+      limitPerUser: form.value.limitPerUser || 1,
+      saleTime: form.value.saleTime,
+      description: form.value.description
+    })
     submitting.value = false
     submitSuccess.value = true
-  }, 2000)
+  } finally {
+    submitting.value = false
+  }
 }
+
+const fetchSeriesOptions = async () => {
+  const data = await apiAdminSeriesList({ page: 1, limit: 100 })
+  seriesOptions.value = data.list || []
+}
+
+onMounted(() => {
+  fetchSeriesOptions()
+})
 </script>
 
 <template>

@@ -48,6 +48,11 @@ const routes = [
         component: () => import('../views/user/profile.vue')
       },
       {
+        path: 'follows',
+        name: 'MyFollows',
+        component: () => import('../views/user/follows.vue')
+      },
+      {
         path: 'orders',
         name: 'Orders',
         component: () => import('../views/order/index.vue')
