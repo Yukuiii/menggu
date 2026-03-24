@@ -4,16 +4,21 @@
  */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import {
   ArrowLeft, Upload, Image as ImageIcon,
   CheckCircle, AlertCircle, Loader2, Info, Hash, Clock
 } from 'lucide-vue-next'
 import { apiCreatorPublish } from '../../api/creator'
 import { apiAdminSeriesList } from '../../api/admin'
+import { apiUploadCover, apiUploadFile } from '../../api/upload'
 
 const router = useRouter()
 
 const seriesOptions = ref([])
+const coverInputRef = ref(null)
+const fileInputRef = ref(null)
+const uploading = ref({ cover: false, file: false })
 
 const form = ref({
   seriesId: '',
@@ -32,16 +37,47 @@ const form = ref({
 const submitting = ref(false)
 const submitSuccess = ref(false)
 
-// 模拟图片上传
+/** 触发文件选择 */
 const triggerUpload = (type) => {
-  // 仅作演示
-  setTimeout(() => {
-    if (type === 'cover') {
-      form.value.coverUrl = 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=400'
-    } else {
-      form.value.fileUrl = 'https://example.com/file'
-    }
-  }, 1000)
+  if (type === 'cover') {
+    coverInputRef.value?.click()
+  } else {
+    fileInputRef.value?.click()
+  }
+}
+
+/** 处理封面图上传 */
+const handleCoverChange = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  uploading.value.cover = true
+  try {
+    const data = await apiUploadCover(file)
+    form.value.coverUrl = data.url
+    ElMessage.success('封面上传成功')
+  } catch {
+    ElMessage.error('封面上传失败')
+  } finally {
+    uploading.value.cover = false
+    e.target.value = ''
+  }
+}
+
+/** 处理原文件上传 */
+const handleFileChange = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  uploading.value.file = true
+  try {
+    const data = await apiUploadFile(file)
+    form.value.fileUrl = data.url
+    ElMessage.success('文件上传成功')
+  } catch {
+    ElMessage.error('文件上传失败')
+  } finally {
+    uploading.value.file = false
+    e.target.value = ''
+  }
 }
 
 /** 提交审核 */
@@ -109,9 +145,17 @@ onMounted(() => {
           <div class="form-section">
             <h3 class="section-title">藏品文件</h3>
             <div class="upload-grid">
+              <!-- 隐藏的文件输入 -->
+              <input ref="coverInputRef" type="file" accept="image/*" style="display:none" @change="handleCoverChange" />
+              <input ref="fileInputRef" type="file" style="display:none" @change="handleFileChange" />
+
               <!-- 封面图 -->
               <div class="upload-box" @click="triggerUpload('cover')">
-                <template v-if="form.coverUrl">
+                <template v-if="uploading.cover">
+                  <Loader2 :size="32" class="upload-icon spin" />
+                  <span class="upload-text">上传中...</span>
+                </template>
+                <template v-else-if="form.coverUrl">
                   <img :src="form.coverUrl" alt="cover" class="preview-img" />
                   <div class="upload-hover">更换封面图</div>
                 </template>
@@ -124,7 +168,11 @@ onMounted(() => {
 
               <!-- 原文件 -->
               <div class="upload-box" @click="triggerUpload('file')">
-                <template v-if="form.fileUrl">
+                <template v-if="uploading.file">
+                  <Loader2 :size="32" class="upload-icon spin" />
+                  <span class="upload-text">上传中...</span>
+                </template>
+                <template v-else-if="form.fileUrl">
                   <div class="file-ready">
                     <CheckCircle :size="32" class="success-icon" />
                     <span>源文件已就绪</span>
