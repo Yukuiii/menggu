@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 3000,
+    allowedHosts:['.ngrok-free.app'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
