@@ -6,9 +6,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
-  Home, ChevronRight, Palette, Plus, Clock, CheckCircle,
-  XCircle, Eye, Edit3, TrendingUp, DollarSign, Package,
-  ShoppingBag, BarChart3, Upload, Image, FileText, Send, UserPlus
+  Palette, Plus, Clock, CheckCircle,
+  XCircle, Edit3, TrendingUp, DollarSign, Package,
+  ShoppingBag, Send, UserPlus
 } from 'lucide-vue-next'
 import { apiCreatorProfile, apiCreatorStats, apiCreatorWorks, apiCreatorApply } from '../../api/creator'
 
@@ -175,11 +175,23 @@ const getStatusInfo = (status) => {
               </div>
               <div class="form-group">
                 <label class="form-label">认证类型</label>
-                <select v-model="applyForm.certifiedType" class="form-input select">
-                  <option value="individual">个人创作者</option>
-                  <option value="studio">工作室</option>
-                  <option value="institution">机构</option>
-                </select>
+                <div class="type-options">
+                  <label :class="['type-option', { active: applyForm.certifiedType === 'individual' }]">
+                    <input type="radio" v-model="applyForm.certifiedType" value="individual" />
+                    <span class="type-dot"></span>
+                    <span class="type-text">个人创作者</span>
+                  </label>
+                  <label :class="['type-option', { active: applyForm.certifiedType === 'studio' }]">
+                    <input type="radio" v-model="applyForm.certifiedType" value="studio" />
+                    <span class="type-dot"></span>
+                    <span class="type-text">工作室</span>
+                  </label>
+                  <label :class="['type-option', { active: applyForm.certifiedType === 'institution' }]">
+                    <input type="radio" v-model="applyForm.certifiedType" value="institution" />
+                    <span class="type-dot"></span>
+                    <span class="type-text">机构</span>
+                  </label>
+                </div>
               </div>
               <button type="submit" class="btn-apply" :disabled="applying">
                 <Send :size="16" />
@@ -402,6 +414,59 @@ const getStatusInfo = (status) => {
   background-position: right 16px center;
   background-size: 16px;
   cursor: pointer;
+}
+
+/* 认证类型单选组 */
+.type-options {
+  display: flex;
+  gap: 12px;
+}
+.type-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.type-option:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+.type-option.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 3px rgba(198,137,63,0.1);
+}
+.type-option input { display: none; }
+.type-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.2s;
+}
+.type-option.active .type-dot {
+  border-color: var(--accent);
+}
+.type-option.active .type-dot::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.type-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
 }
 .form-row {
   display: flex;
