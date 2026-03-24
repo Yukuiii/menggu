@@ -32,7 +32,7 @@ const handleLogin = async () => {
   try {
     const data = await apiLogin({ email: form.value.email, password: form.value.password })
     userStore.loginSuccess(data)
-    router.push('/')
+    router.push('/market')
   } catch (e) {
     error.value = e.message || '账号或密码错误，请重试'
   } finally {
