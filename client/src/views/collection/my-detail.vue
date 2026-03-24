@@ -9,6 +9,7 @@ import {
   ArrowLeft, Download, Send, CheckCircle, Clock,
   Hash, Code, Layers, FileText, ArrowRight, Copy, ShieldCheck, User
 } from 'lucide-vue-next'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { apiMyCollectionDetail, apiTransfer, getDownloadUrl } from '../../api/userCollection'
 
 const route = useRoute()
@@ -89,13 +90,29 @@ const handleDownload = () => {
 /** 转赠操作 */
 const handleGift = async () => {
   if (!userCol.value.isTransferable) {
-    alert('该藏品还在冷却期，暂不可转赠')
+    ElMessage.warning('该藏品还在冷却期，暂不可转赠')
     return
   }
-  const recipientAddress = window.prompt('请输入接收方钱包地址')
-  if (!recipientAddress) return
-  await apiTransfer(route.params.id, recipientAddress)
-  await fetchMyCollectionDetail()
+  try {
+    const { value: recipientAddress } = await ElMessageBox.prompt(
+      '请输入接收方的钱包地址',
+      '转赠藏品',
+      {
+        confirmButtonText: '确认转赠',
+        cancelButtonText: '取消',
+        inputPlaceholder: '0x...',
+        inputPattern: /^0x[a-fA-F0-9]{40}$/,
+        inputErrorMessage: '请输入有效的钱包地址（0x 开头的 42 位字符）'
+      }
+    )
+    if (!recipientAddress) return
+    await apiTransfer(route.params.id, recipientAddress)
+    ElMessage.success('转赠成功！')
+    // 转赠成功后，该藏品已不属于当前用户，跳转回我的藏品列表
+    router.push('/my-collections')
+  } catch {
+    // 用户取消，不做处理
+  }
 }
 
 onMounted(() => {
