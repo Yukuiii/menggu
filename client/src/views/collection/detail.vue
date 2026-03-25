@@ -1,14 +1,14 @@
 <script setup>
 /**
- * 藏品详情页 - 展示藏品完整信息、链上存证、流转记录、购买操作
+ * 藏品详情页 - 展示藏品完整信息、链上存证、购买操作
  */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  Home, ChevronRight, ArrowLeft, Gem, Clock, ShieldCheck,
+  Home, ChevronRight, ArrowLeft, Gem, ShieldCheck,
   Hash, FileCode, Layers, Calendar, User, Award,
-  ArrowRight, Share2, Heart, ExternalLink, Copy, CheckCircle,
-  Flame, ShoppingCart, Gift, UserPlus, UserCheck
+  Share2, Heart, Copy, CheckCircle,
+  Flame, ShoppingCart, UserPlus, UserCheck
 } from 'lucide-vue-next'
 import { apiFollow, apiUnfollow, apiCheckFollow } from '../../api/follow'
 import { apiCollectionDetail } from '../../api/collection'
@@ -51,8 +51,7 @@ const collection = ref({
     blockHeight: 0,
     chainTime: '',
     tokenId: 0
-  },
-  transfers: []
+  }
 })
 
 const fetchCollectionDetail = async () => {
@@ -82,14 +81,7 @@ const fetchCollectionDetail = async () => {
       blockHeight: data.blockHeight || 0,
       chainTime: data.chainTime || '',
       tokenId: data.currentNo || 0
-    },
-    transfers: (data.transfers || []).map((t) => ({
-      type: t.type,
-      from: t.fromUser?.nickname || '平台铸造',
-      to: t.toUser?.nickname || '-',
-      time: t.createdAt ? new Date(t.createdAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
-      hash: t.chainHash || '-'
-    }))
+    }
   }
 }
 
@@ -156,17 +148,6 @@ onMounted(() => {
   fetchCollectionDetail()
   checkFollowStatus()
 })
-
-/** 流转类型图标与文案 */
-const getTransferInfo = (type) => {
-  const map = {
-    mint: { label: '铸造', icon: Gem, color: '#C6893F' },
-    list: { label: '上架', icon: ShoppingCart, color: '#845EF7' },
-    buy: { label: '购买', icon: ShoppingCart, color: '#20C997' },
-    gift: { label: '转赠', icon: Gift, color: '#FD7E14' }
-  }
-  return map[type] || map.buy
-}
 </script>
 
 <template>
@@ -354,40 +335,6 @@ const getTransferInfo = (type) => {
                   </div>
                   <div class="chain-value">
                     <span>#{{ collection.chain.tokenId }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- 流转记录 -->
-          <section class="section-card">
-            <h2 class="section-title">
-              <ArrowRight :size="20" />
-              流转记录
-            </h2>
-            <div class="section-body">
-              <div class="timeline">
-                <div v-for="(t, i) in collection.transfers" :key="i" class="timeline-item">
-                  <div class="timeline-dot" :style="{ background: getTransferInfo(t.type).color }">
-                    <component :is="getTransferInfo(t.type).icon" :size="14" color="#fff" />
-                  </div>
-                  <div class="timeline-content">
-                    <div class="timeline-header">
-                      <span class="timeline-type" :style="{ color: getTransferInfo(t.type).color }">
-                        {{ getTransferInfo(t.type).label }}
-                      </span>
-                      <span class="timeline-time">{{ t.time }}</span>
-                    </div>
-                    <div class="timeline-detail">
-                      <span>{{ t.from }}</span>
-                      <ArrowRight :size="12" class="timeline-arrow" />
-                      <span>{{ t.to }}</span>
-                    </div>
-                    <div class="timeline-hash">
-                      <Hash :size="11" />
-                      {{ t.hash }}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -740,46 +687,6 @@ const getTransferInfo = (type) => {
 }
 .copy-btn:hover { color: var(--accent); background: var(--accent-bg); }
 .copied { color: #20C997; }
-
-/* 流转记录时间线 */
-.timeline { position: relative; padding-left: 48px; }
-.timeline::before {
-  content: ''; position: absolute; left: 15px; top: 20px; bottom: 20px;
-  width: 2px; background: var(--border);
-}
-
-.timeline-item {
-  position: relative; display: flex; gap: 16px;
-  padding: 16px 0;
-}
-.timeline-item:first-child { padding-top: 0; }
-.timeline-item:last-child { padding-bottom: 0; }
-
-.timeline-dot {
-  position: absolute; left: -48px;
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; z-index: 1;
-  box-shadow: 0 0 0 4px var(--card-bg);
-}
-
-.timeline-content { flex: 1; min-width: 0; }
-.timeline-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 6px;
-}
-.timeline-type { font-size: 14px; font-weight: 700; }
-.timeline-time { font-size: 12px; color: var(--text-light); }
-.timeline-detail {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--text);
-}
-.timeline-arrow { color: var(--text-light); }
-.timeline-hash {
-  display: flex; align-items: center; gap: 4px;
-  font-size: 11px; color: var(--text-light); margin-top: 4px;
-  font-family: 'SF Mono', 'Fira Code', monospace;
-}
 
 /* 关注按钮（顶部小尺寸） */
 .btn-follow-sm {

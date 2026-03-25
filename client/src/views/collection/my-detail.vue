@@ -6,8 +6,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  ArrowLeft, Download, Send, CheckCircle, Clock,
-  Hash, Code, Layers, FileText, ArrowRight, Copy, ShieldCheck, User
+  ArrowLeft, Download, Send, CheckCircle,
+  Hash, Layers, ArrowRight, Copy, ShieldCheck, User, Gem, ShoppingCart, Gift
 } from 'lucide-vue-next'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { apiMyCollectionDetail, apiTransfer, getDownloadUrl } from '../../api/userCollection'
@@ -40,6 +40,16 @@ const userCol = ref({
 
 const transfers = ref([])
 
+/** 获取流转类型图标与文案 */
+const getTransferInfo = (type) => {
+  const map = {
+    mint: { label: '铸造', icon: Gem, color: '#C6893F' },
+    purchase: { label: '购买', icon: ShoppingCart, color: '#20C997' },
+    gift: { label: '转赠', icon: Gift, color: '#FD7E14' }
+  }
+  return map[type] || map.purchase
+}
+
 const fetchMyCollectionDetail = async () => {
   const data = await apiMyCollectionDetail(route.params.id)
   userCol.value = {
@@ -65,7 +75,6 @@ const fetchMyCollectionDetail = async () => {
   transfers.value = (data.transfers || []).map((item) => ({
     id: item.id,
     type: item.type,
-    action: item.type === 'gift' ? '转赠' : (item.type === 'mint' ? '铸造' : '购买'),
     from: item.fromUser?.nickname || '',
     to: item.toUser?.nickname || '我',
     time: item.createdAt ? new Date(item.createdAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : '-',
@@ -215,27 +224,27 @@ onMounted(() => {
         <section class="info-section">
           <h3 class="section-title"><Layers :size="20" class="sec-icon" /> 流转记录</h3>
           <div class="timeline">
-            <div v-for="(tf, index) in transfers" :key="tf.id" class="timeline-item">
-              <div class="tl-node">
-                <component 
-                  :is="tf.type === 'purchase' ? Download : (tf.type === 'mint' ? Code : Send)" 
-                  :size="14" 
-                />
+            <div v-for="tf in transfers" :key="tf.id" class="timeline-item">
+              <div class="timeline-dot" :style="{ background: getTransferInfo(tf.type).color }">
+                <component :is="getTransferInfo(tf.type).icon" :size="14" color="#fff" />
               </div>
-              <div class="tl-content" :class="{ 'is-first': index === 0 }">
-                <div class="tl-header">
-                  <span class="tl-action">{{ tf.action }}</span>
-                  <span class="tl-time">{{ tf.time }}</span>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="timeline-type" :style="{ color: getTransferInfo(tf.type).color }">
+                    {{ getTransferInfo(tf.type).label }}
+                  </span>
+                  <span class="timeline-time">{{ tf.time }}</span>
                 </div>
-                <div class="tl-path">
-                  <User :size="12" /> 
+                <div class="timeline-detail">
+                  <User :size="12" />
                   <span v-if="tf.from">{{ tf.from }}</span>
                   <span v-else class="text-light">首发铸造</span>
-                  <ArrowRight :size="12" class="tl-arrow" />
+                  <ArrowRight :size="12" class="timeline-arrow" />
                   <span>{{ tf.to }}</span>
                 </div>
-                <div class="tl-hash">
-                  Tx: {{ tf.hash }}
+                <div class="timeline-hash">
+                  <Hash :size="11" />
+                  {{ tf.hash }}
                 </div>
               </div>
             </div>
@@ -512,71 +521,73 @@ onMounted(() => {
 .btn-copy:hover { color: var(--accent); }
 .copied { color: #10B981; }
 
-/* 垂直时间线 */
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.timeline-item {
-  display: flex;
-  gap: 16px;
-  position: relative;
-}
-.timeline-item:not(:last-child)::before {
+/* 流转记录时间线 */
+.timeline { position: relative; padding-left: 48px; }
+.timeline::before {
   content: '';
   position: absolute;
-  left: 17px; top: 32px; bottom: -20px;
+  left: 15px;
+  top: 20px;
+  bottom: 20px;
   width: 2px;
   background: var(--border);
 }
-.tl-node {
-  width: 36px; height: 36px;
+
+.timeline-item {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+}
+.timeline-item:first-child { padding-top: 0; }
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-dot {
+  position: absolute;
+  left: -48px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: var(--bg-soft);
-  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   z-index: 1;
-  border: 4px solid var(--card-bg);
+  box-shadow: 0 0 0 4px var(--card-bg);
 }
-.tl-content {
+
+.timeline-content {
   flex: 1;
-  background: var(--bg-soft);
-  border-radius: 12px;
-  padding: 16px;
+  min-width: 0;
 }
-.tl-content.is-first {
-  background: var(--accent-bg);
-  border: 1px solid rgba(198,137,63,0.2);
-}
-.tl-header {
+.timeline-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
-.tl-action { font-weight: 700; font-size: 14px; color: var(--text-h); }
-.tl-time { font-size: 12px; color: var(--text-light); }
-.tl-path {
+.timeline-type {
+  font-size: 14px;
+  font-weight: 700;
+}
+.timeline-time { font-size: 12px; color: var(--text-light); }
+.timeline-detail {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
   color: var(--text);
-  margin-bottom: 8px;
 }
 .text-light { color: var(--text-light); }
-.tl-arrow { color: var(--text-light); opacity: 0.5; }
-.tl-hash {
+.timeline-arrow { color: var(--text-light); }
+.timeline-hash {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
   color: var(--text-light);
-  font-family: monospace;
-  background: rgba(0,0,0,0.03);
-  padding: 4px 8px;
-  border-radius: 6px;
-  display: inline-block;
+  margin-top: 4px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
 @media (max-width: 768px) {

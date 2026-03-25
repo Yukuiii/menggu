@@ -1,4 +1,4 @@
-const { Collection, Creator, TransferRecord, User } = require('../models')
+const { Collection, Creator } = require('../models')
 const { success, fail } = require('../utils/response')
 const { Op } = require('sequelize')
 
@@ -65,7 +65,7 @@ exports.list = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-/** 获取藏品详情（含创作者信息和流转记录） */
+/** 获取藏品详情（含创作者信息） */
 exports.detail = async (req, res, next) => {
   try {
     const collection = await Collection.findByPk(req.params.id, {
@@ -77,17 +77,7 @@ exports.detail = async (req, res, next) => {
 
     if (!collection) return fail(res, '藏品不存在')
 
-    // 查询流转记录
-    const transfers = await TransferRecord.findAll({
-      where: { collectionId: collection.id },
-      include: [
-        { model: User, as: 'fromUser', attributes: ['id', 'nickname', 'walletAddress'] },
-        { model: User, as: 'toUser', attributes: ['id', 'nickname', 'walletAddress'] }
-      ],
-      order: [['createdAt', 'DESC']]
-    })
-
-    success(res, { ...collection.toJSON(), transfers })
+    success(res, collection)
   } catch (err) { next(err) }
 }
 
