@@ -1,4 +1,4 @@
-const { User, Order, Collection, Creator, Notification, UserCollection, Announcement, sequelize } = require('../models')
+const { User, Order, Collection, Creator, Notification, UserCollection, sequelize } = require('../models')
 const { success, fail } = require('../utils/response')
 const { generateChainHash, generateContractAddress, getNextBlockHeight } = require('../utils/chain')
 const { Op } = require('sequelize')
@@ -341,51 +341,6 @@ exports.creatorList = async (req, res, next) => {
     })
 
     success(res, { list: rows, total: count, page: parseInt(page), limit: parseInt(limit) })
-  } catch (err) { next(err) }
-}
-
-/** 公告列表 */
-exports.announcementList = async (req, res, next) => {
-  try {
-    const { page = 1, limit = 20 } = req.query
-    const offset = (parseInt(page) - 1) * parseInt(limit)
-    const { count, rows } = await Announcement.findAndCountAll({
-      order: [['createdAt', 'DESC']],
-      offset,
-      limit: parseInt(limit)
-    })
-    success(res, { list: rows, total: count, page: parseInt(page), limit: parseInt(limit) })
-  } catch (err) { next(err) }
-}
-
-/** 创建公告 */
-exports.createAnnouncement = async (req, res, next) => {
-  try {
-    const { title, content } = req.body
-    if (!title || !content) return fail(res, '请填写公告标题和内容')
-    const announcement = await Announcement.create({ title, content, isActive: true })
-    success(res, announcement, '公告创建成功')
-  } catch (err) { next(err) }
-}
-
-/** 更新公告 */
-exports.updateAnnouncement = async (req, res, next) => {
-  try {
-    const announcement = await Announcement.findByPk(req.params.id)
-    if (!announcement) return fail(res, '公告不存在')
-    const { title, content, isActive } = req.body
-    await announcement.update({ title, content, isActive })
-    success(res, announcement, '公告更新成功')
-  } catch (err) { next(err) }
-}
-
-/** 删除公告 */
-exports.deleteAnnouncement = async (req, res, next) => {
-  try {
-    const announcement = await Announcement.findByPk(req.params.id)
-    if (!announcement) return fail(res, '公告不存在')
-    await announcement.destroy()
-    success(res, null, '公告已删除')
   } catch (err) { next(err) }
 }
 

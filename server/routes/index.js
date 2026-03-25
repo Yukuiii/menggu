@@ -10,5 +10,6 @@ router.use('/my-collections', require('./userCollection'))
 router.use('/wallet', require('./wallet'))
 router.use('/upload', require('./upload'))
 router.use('/follows', require('./follow'))
+router.use('/notifications', require('./notification'))
 
 module.exports = router

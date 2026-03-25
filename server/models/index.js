@@ -25,8 +25,6 @@ const UserCollection = require('./UserCollection')(sequelize)
 const TransferRecord = require('./TransferRecord')(sequelize)
 const RechargeRecord = require('./RechargeRecord')(sequelize)
 const Notification = require('./Notification')(sequelize)
-const Banner = require('./Banner')(sequelize)
-const Announcement = require('./Announcement')(sequelize)
 const CreatorRevenue = require('./CreatorRevenue')(sequelize)
 
 const Follow = require('./Follow')(sequelize)
@@ -90,8 +88,6 @@ module.exports = {
   TransferRecord,
   RechargeRecord,
   Notification,
-  Banner,
-  Announcement,
   CreatorRevenue,
   Follow
 }

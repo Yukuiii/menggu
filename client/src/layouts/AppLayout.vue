@@ -2,25 +2,63 @@
 /**
  * 应用布局 - 除首页外所有页面共用的导航栏 + 页脚
  */
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '../stores'
-import { Menu, X, User, LogOut, Shield } from 'lucide-vue-next'
+import { Menu, X, User, LogOut, Shield, Bell } from 'lucide-vue-next'
+import { apiNotificationUnreadCount } from '../api/notification'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const navOpen = ref(false)
+const unreadCount = ref(0)
 
 /** 是否已登录 */
 const isLoggedIn = computed(() => !!userStore.token)
 /** 是否是管理员 */
 const isAdmin = computed(() => userStore.userInfo?.role === 'admin')
+/** 站内信未读数展示文本 */
+const unreadLabel = computed(() => (unreadCount.value > 99 ? '99+' : String(unreadCount.value)))
 
 /** 退出登录 */
 const handleLogout = () => {
   userStore.logout()
+  unreadCount.value = 0
   router.push('/login')
 }
+
+/** 加载站内信未读数量 */
+const fetchUnreadCount = async () => {
+  if (!isLoggedIn.value) {
+    unreadCount.value = 0
+    return
+  }
+  try {
+    const data = await apiNotificationUnreadCount()
+    unreadCount.value = Number(data.unreadCount || 0)
+  } catch {
+    unreadCount.value = 0
+  }
+}
+
+/** 响应站内信状态变化 */
+const handleNotificationsUpdated = () => {
+  fetchUnreadCount()
+}
+
+watch(() => route.fullPath, () => {
+  fetchUnreadCount()
+})
+
+onMounted(() => {
+  fetchUnreadCount()
+  window.addEventListener('notifications-updated', handleNotificationsUpdated)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('notifications-updated', handleNotificationsUpdated)
+})
 </script>
 
 <template>
@@ -44,6 +82,10 @@ const handleLogout = () => {
         <!-- 右侧操作 -->
         <div class="nav-actions">
           <template v-if="isLoggedIn">
+            <router-link to="/notifications" class="btn-nav-bell" aria-label="站内信">
+              <Bell :size="16" />
+              <span v-if="unreadCount > 0" class="nav-badge">{{ unreadLabel }}</span>
+            </router-link>
             <router-link to="/profile" class="btn-nav-user">
               <User :size="16" />
               <span>{{ userStore.userInfo?.nickname || '个人中心' }}</span>
@@ -73,6 +115,7 @@ const handleLogout = () => {
         <router-link to="/creator" class="nav-mobile-link" @click="navOpen = false">创作者</router-link>
         <router-link v-if="isAdmin" to="/admin" class="nav-mobile-link" @click="navOpen = false">管理后台</router-link>
         <template v-if="isLoggedIn">
+          <router-link to="/notifications" class="nav-mobile-link" @click="navOpen = false">站内信</router-link>
           <router-link to="/profile" class="nav-mobile-link" @click="navOpen = false">个人中心</router-link>
         </template>
         <template v-else>
@@ -243,6 +286,44 @@ const handleLogout = () => {
 .btn-nav-user:hover {
   background: var(--accent);
   color: #fff;
+}
+
+.btn-nav-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-light);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-nav-bell:hover,
+.btn-nav-bell.router-link-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e03131;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--card-bg);
 }
 
 .btn-nav-logout {

@@ -195,35 +195,6 @@ CREATE TABLE `notifications` (
 ) ENGINE=InnoDB COMMENT='消息通知表';
 
 -- ----------------------------
--- Banner轮播图表
--- ----------------------------
-CREATE TABLE `banners` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Banner ID',
-  `title` VARCHAR(100) DEFAULT NULL COMMENT '标题',
-  `image_url` VARCHAR(255) NOT NULL COMMENT '图片URL',
-  `link_url` VARCHAR(255) DEFAULT NULL COMMENT '跳转链接',
-  `sort_order` INT NOT NULL DEFAULT 0 COMMENT '排序（数值越小越靠前）',
-  `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB COMMENT='Banner轮播图表';
-
--- ----------------------------
--- 系统公告表
--- ----------------------------
-CREATE TABLE `announcements` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '公告ID',
-  `title` VARCHAR(100) NOT NULL COMMENT '公告标题',
-  `content` TEXT NOT NULL COMMENT '公告内容',
-  `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB COMMENT='系统公告表';
-
-
-
--- ----------------------------
 -- 关注关系表
 -- ----------------------------
 CREATE TABLE `follows` (

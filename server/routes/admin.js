@@ -23,12 +23,6 @@ router.post('/orders/:id/refund', auth, adminController.refundOrder)
 router.get('/creators', auth, adminController.creatorList)
 router.post('/creators/:id/audit', auth, adminController.auditCreator)
 
-// 公告管理
-router.get('/announcements', auth, adminController.announcementList)
-router.post('/announcements', auth, adminController.createAnnouncement)
-router.put('/announcements/:id', auth, adminController.updateAnnouncement)
-router.delete('/announcements/:id', auth, adminController.deleteAnnouncement)
-
 // 系统设置
 router.get('/settings', auth, adminController.getSettings)
 router.put('/settings', auth, adminController.updateSettings)
